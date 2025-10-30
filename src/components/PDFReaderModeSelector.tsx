@@ -12,7 +12,7 @@ interface PDFReaderModeSelectorProps {
 const PDFReaderModeSelector = ({ isOpen, onClose, onSelectMode, bookTitle }: PDFReaderModeSelectorProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-3xl">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Como você quer ler este livro?
@@ -20,7 +20,7 @@ const PDFReaderModeSelector = ({ isOpen, onClose, onSelectMode, bookTitle }: PDF
           <p className="text-sm text-muted-foreground text-center mt-2">{bookTitle}</p>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
+        <div className="grid grid-cols-2 gap-6 py-6">
           <Card 
             className="group relative p-8 cursor-pointer transition-all duration-300 border-2 hover:border-primary hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1 overflow-hidden"
             onClick={() => onSelectMode('normal')}
