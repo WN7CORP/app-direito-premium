@@ -72,13 +72,13 @@ export const ArtigoActionsMenu = ({
         </Button>
       </CollapsibleTrigger>
       
-      <CollapsibleContent className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
-        <div className="pt-3 grid grid-cols-2 gap-2 data-[state=open]:animate-enter" data-state={isOpen ? 'open' : 'closed'}>
+      <CollapsibleContent className="overflow-hidden transition-all duration-200">
+        <div className="pt-3 grid grid-cols-2 gap-2 animate-fade-in">
           {/* Explicar */}
           {onOpenExplicacao && (
             <button
               onClick={() => onOpenExplicacao("explicacao")}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
               style={{ animationDelay: '0ms' }}
             >
               <Lightbulb className="w-4 h-4" />
@@ -90,8 +90,8 @@ export const ArtigoActionsMenu = ({
           {onOpenExplicacao && (
             <button
               onClick={() => onOpenExplicacao("exemplo")}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50"
-              style={{ animationDelay: '50ms' }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              style={{ animationDelay: '30ms' }}
             >
               <BookOpen className="w-4 h-4" />
               <span>Exemplo</span>
@@ -102,8 +102,8 @@ export const ArtigoActionsMenu = ({
           {onOpenTermos && (
             <button
               onClick={onOpenTermos}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50"
-              style={{ animationDelay: '100ms' }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              style={{ animationDelay: '60ms' }}
             >
               <BookMarked className="w-4 h-4" />
               <span>Termos</span>
@@ -114,8 +114,8 @@ export const ArtigoActionsMenu = ({
           {onOpenQuestoes && (
             <button
               onClick={onOpenQuestoes}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50"
-              style={{ animationDelay: '150ms' }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              style={{ animationDelay: '90ms' }}
             >
               <FileQuestion className="w-4 h-4" />
               <span>Questões</span>
@@ -127,8 +127,8 @@ export const ArtigoActionsMenu = ({
             <button
               onClick={onGenerateFlashcards}
               disabled={loadingFlashcards}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50 disabled:opacity-50"
-              style={{ animationDelay: '200ms' }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg disabled:opacity-50"
+              style={{ animationDelay: '120ms' }}
             >
               <Bookmark className="w-4 h-4" />
               <span>{loadingFlashcards ? "Gerando..." : "Flashcards"}</span>
@@ -142,8 +142,8 @@ export const ArtigoActionsMenu = ({
                 article["Comentario"]!,
                 `Comentário - Art. ${article["Número do Artigo"]}`
               )}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50"
-              style={{ animationDelay: '250ms' }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              style={{ animationDelay: '150ms' }}
             >
               <MessageSquare className="w-4 h-4" />
               <span>Comentário</span>
@@ -154,8 +154,8 @@ export const ArtigoActionsMenu = ({
           {hasAula && onOpenAula && (
             <button
               onClick={onOpenAula}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50"
-              style={{ animationDelay: '300ms' }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              style={{ animationDelay: '180ms' }}
             >
               <GraduationCap className="w-4 h-4" />
               <span>Aula</span>
@@ -166,8 +166,8 @@ export const ArtigoActionsMenu = ({
           {onPerguntar && (
             <button
               onClick={onPerguntar}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50"
-              style={{ animationDelay: '350ms' }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              style={{ animationDelay: '210ms' }}
             >
               <MessageSquare className="w-4 h-4" />
               <span>Perguntar</span>
@@ -178,8 +178,8 @@ export const ArtigoActionsMenu = ({
           {onShareWhatsApp && (
             <button
               onClick={onShareWhatsApp}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-black/80 hover:bg-black text-white rounded-lg transition-all text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg shadow-black/50"
-              style={{ animationDelay: '6400ms' }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              style={{ animationDelay: '240ms' }}
             >
               <Share2 className="w-4 h-4" />
               <span>WhatsApp</span>

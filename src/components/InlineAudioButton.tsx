@@ -86,16 +86,16 @@ const InlineAudioButton = ({ audioUrl, articleNumber, onPlay }: InlineAudioButto
         onCanPlayThrough={handleCanPlayThrough}
       />
       
-      {/* Botão de Narração com cor vermelha e animação de ondas */}
+      {/* Botão de Narração - maior e com texto branco */}
       <button
         onClick={togglePlay}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-all text-sm shadow-lg hover:shadow-xl hover:scale-105 animate-fade-in relative overflow-hidden bg-accent/15 hover:bg-accent/25 border border-accent/30 text-accent group"
+        className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg transition-all text-base font-medium shadow-lg hover:shadow-xl hover:scale-105 animate-fade-in relative overflow-hidden bg-accent/70 hover:bg-accent/90 border border-accent/30 text-white group"
       >
         {/* Progress Fill */}
         {isPlaying && (
           <div 
-            className="absolute inset-0 bg-accent/10 transition-all duration-200 ease-linear"
+            className="absolute inset-0 bg-white/10 transition-all duration-200 ease-linear"
             style={{ width: `${progress}%` }}
           />
         )}
@@ -103,19 +103,19 @@ const InlineAudioButton = ({ audioUrl, articleNumber, onPlay }: InlineAudioButto
         {/* Content */}
         <div className="relative z-10 flex items-center gap-2">
           {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin text-white" />
           ) : isPlaying ? (
             <>
               <AudioWaveAnimation />
-              <Pause className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity absolute left-0" />
+              <Pause className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity absolute left-0 text-white" />
             </>
           ) : (
-            <span className="font-medium text-xs sm:text-sm">
+            <span className="font-medium text-white">
               {articleNumber}
             </span>
           )}
           {isPlaying && (
-            <span className="font-medium text-xs sm:text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="font-medium opacity-0 group-hover:opacity-100 transition-opacity text-white">
               Pausar
             </span>
           )}
