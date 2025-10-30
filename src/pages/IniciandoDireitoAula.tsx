@@ -59,13 +59,11 @@ export default function IniciandoDireitoAula() {
       carregarTodasAulas();
     }
   }, [areaDecoded, temaDecoded]);
-
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       setShowScrollTop(scrollTop > 300);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -141,9 +139,11 @@ export default function IniciandoDireitoAula() {
       navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}/${encodeURIComponent(aulaAnterior.tema)}`);
     }
   };
-
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
   const getYouTubeEmbedUrl = (url: string) => {
     if (!url) return '';
@@ -176,15 +176,7 @@ export default function IniciandoDireitoAula() {
       <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}`)} 
-              className="hover:bg-muted"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Button>
+            
           </div>
           
           <div>
@@ -297,16 +289,9 @@ export default function IniciandoDireitoAula() {
         </div>
 
         {/* Botão de voltar ao topo */}
-        {showScrollTop && (
-          <Button
-            onClick={scrollToTop}
-            size="icon"
-            className="fixed bottom-20 right-6 rounded-full shadow-lg z-50 animate-fade-in"
-            aria-label="Voltar ao topo"
-          >
+        {showScrollTop && <Button onClick={scrollToTop} size="icon" className="fixed bottom-20 right-6 rounded-full shadow-lg z-50 animate-fade-in" aria-label="Voltar ao topo">
             <ArrowUp className="w-5 h-5" />
-          </Button>
-        )}
+          </Button>}
       </div>
     </div>;
 }
