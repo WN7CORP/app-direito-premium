@@ -1,0 +1,178 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, PlayCircle } from "lucide-react";
+import { toast } from "sonner";
+
+interface TemaData {
+  tema: string;
+  ordem: number;
+  'capa-aula': string;
+  'aula-link': string;
+}
+
+const CORES_AREAS: Record<string, string> = {
+  "Direito Penal": "bg-red-600",
+  "Direito Civil": "bg-blue-600",
+  "Direito Constitucional": "bg-green-600",
+  "Direito Administrativo": "bg-purple-600",
+  "Direito Trabalhista": "bg-yellow-600",
+  "Direito Empresarial": "bg-pink-600",
+  "Direito Tributário": "bg-indigo-600",
+  "Direito Processual Civil": "bg-cyan-600",
+  "Direito Processual Penal": "bg-orange-600",
+};
+
+export default function IniciandoDireitoTemas() {
+  const navigate = useNavigate();
+  const { area } = useParams<{ area: string }>();
+  const [temas, setTemas] = useState<TemaData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const areaDecoded = area ? decodeURIComponent(area) : '';
+  const corArea = CORES_AREAS[areaDecoded] || 'bg-gray-600';
+
+  useEffect(() => {
+    if (areaDecoded) {
+      carregarTemas();
+    }
+  }, [areaDecoded]);
+
+  const carregarTemas = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('CURSOS-APP' as any)
+        .select('tema, ordem, "capa-aula", "aula-link"')
+        .eq('area', areaDecoded)
+        .order('ordem');
+
+      if (error) throw error;
+
+      setTemas((data as any) || []);
+    } catch (error) {
+      console.error('Erro ao carregar temas:', error);
+      toast.error('Erro ao carregar temas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center">
+        <div className="text-center">
+          <PlayCircle className="w-16 h-16 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Carregando temas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background pb-20">
+      {/* Header */}
+      <div className="bg-card border-b border-border sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/iniciando-direito')}
+            className="mb-3"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar para Áreas
+          </Button>
+          
+          <div className="flex items-center gap-3">
+            <div className={`w-3 h-12 rounded ${corArea}`} />
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{areaDecoded}</h1>
+              <p className="text-sm text-muted-foreground">
+                {temas.length} {temas.length === 1 ? 'tema disponível' : 'temas disponíveis'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Conteúdo */}
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Timeline de Temas */}
+        <div className="relative space-y-6">
+          {/* Linha vertical */}
+          <div className="absolute left-[9px] top-0 bottom-0 w-0.5 bg-border" />
+
+          {temas.map((temaData, index) => (
+            <div 
+              key={index} 
+              className="relative pl-8 animate-fade-in"
+              style={{ 
+                animationDelay: `${index * 0.1}s`,
+                animationFillMode: 'backwards'
+              }}
+            >
+              {/* Marcador colorido */}
+              <div className={`absolute left-0 top-4 w-7 h-7 rounded-full ${corArea} border-4 border-background flex items-center justify-center shadow-lg`}>
+                <span className="text-xs font-bold text-white">{temaData.ordem}</span>
+              </div>
+              
+              {/* Card do tema */}
+              <button
+                onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}/${encodeURIComponent(temaData.tema)}`)}
+                className="w-full text-left bg-card/80 backdrop-blur-sm border-2 border-border rounded-lg overflow-hidden hover:border-primary hover:shadow-2xl shadow-xl transition-all group"
+              >
+                {/* Imagem de capa */}
+                {temaData['capa-aula'] && (
+                  <div className="relative h-40 overflow-hidden bg-muted">
+                    <img
+                      src={temaData['capa-aula']}
+                      alt={temaData.tema}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute top-2 right-2">
+                      <div className={`${corArea} text-white px-3 py-1 rounded-full text-xs font-semibold`}>
+                        Aula {temaData.ordem}
+                      </div>
+                    </div>
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <PlayCircle className="w-8 h-8 text-white mb-2 opacity-80 group-hover:opacity-100" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Conteúdo */}
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+                    {temaData.tema}
+                  </h3>
+                  
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <PlayCircle className="w-3 h-3" />
+                    <span>Videoaula + Conteúdo Detalhado</span>
+                  </div>
+
+                  <div className="mt-3 text-right">
+                    <span className="text-xs text-primary font-semibold group-hover:underline">
+                      Começar aula →
+                    </span>
+                  </div>
+                </div>
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {temas.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Nenhum tema encontrado para esta área.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
