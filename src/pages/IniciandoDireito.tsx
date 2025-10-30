@@ -135,8 +135,8 @@ export default function IniciandoDireito() {
             }} />
                 
                 {/* Card da área com background gradiente */}
-                <button onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaData.area)}`)} className={`w-full text-left relative overflow-hidden backdrop-blur-sm border-2 border-border/50 rounded-lg p-5 hover:border-primary hover:shadow-2xl shadow-lg transition-all duration-300 group hover:scale-[1.02]`} style={{
-              background: `linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 80%, ${areaData.cor.replace('bg-', '')} 100%)`,
+                <button onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaData.area)}`)} className={`w-full text-left relative overflow-hidden backdrop-blur-sm border-2 border-border/50 rounded-lg p-5 hover:border-primary hover:shadow-2xl shadow-lg transition-all duration-300 group hover:scale-[1.02] bg-muted/30`} style={{
+              background: `linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted)/0.5) 80%, ${areaData.cor.replace('bg-', '')} 100%)`,
               backgroundSize: '200% 200%',
               backgroundPosition: '0% 0%'
             }}>
