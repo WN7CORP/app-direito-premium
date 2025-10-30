@@ -74,15 +74,17 @@ export default function IniciandoDireitoTemas() {
       {/* Header */}
       <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/iniciando-direito')}
-            className="mb-3"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar para Áreas
-          </Button>
+          <div className="flex items-center justify-between mb-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/iniciando-direito')}
+              className="hover:bg-muted"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+          </div>
           
           <div className="flex items-center gap-3">
             <div className={`w-3 h-12 rounded ${corArea} shadow-lg animate-glow-pulse`} />

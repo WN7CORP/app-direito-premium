@@ -175,10 +175,17 @@ export default function IniciandoDireitoAula() {
       {/* Header */}
       <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}`)} className="mb-3">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar para {areaDecoded}
-          </Button>
+          <div className="flex items-center justify-between mb-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}`)} 
+              className="hover:bg-muted"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+          </div>
           
           <div>
             <div className="text-xs text-muted-foreground mb-1">
