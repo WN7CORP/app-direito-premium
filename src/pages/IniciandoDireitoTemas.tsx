@@ -4,14 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, PlayCircle } from "lucide-react";
 import { toast } from "sonner";
-
 interface TemaData {
   tema: string;
   ordem: number;
   'capa-aula': string;
   'aula-link': string;
 }
-
 const CORES_AREAS: Record<string, string> = {
   "Direito Penal": "bg-red-600",
   "Direito Civil": "bg-blue-600",
@@ -21,35 +19,32 @@ const CORES_AREAS: Record<string, string> = {
   "Direito Empresarial": "bg-pink-600",
   "Direito Tributário": "bg-indigo-600",
   "Direito Processual Civil": "bg-cyan-600",
-  "Direito Processual Penal": "bg-orange-600",
+  "Direito Processual Penal": "bg-orange-600"
 };
-
 export default function IniciandoDireitoTemas() {
   const navigate = useNavigate();
-  const { area } = useParams<{ area: string }>();
+  const {
+    area
+  } = useParams<{
+    area: string;
+  }>();
   const [temas, setTemas] = useState<TemaData[]>([]);
   const [loading, setLoading] = useState(true);
-
   const areaDecoded = area ? decodeURIComponent(area) : '';
   const corArea = CORES_AREAS[areaDecoded] || 'bg-gray-600';
-
   useEffect(() => {
     if (areaDecoded) {
       carregarTemas();
     }
   }, [areaDecoded]);
-
   const carregarTemas = async () => {
     try {
-      const { data, error } = await supabase
-        .from('CURSOS-APP' as any)
-        .select('tema, ordem, "capa-aula", "aula-link"')
-        .eq('area', areaDecoded)
-        .order('ordem');
-
+      const {
+        data,
+        error
+      } = await supabase.from('CURSOS-APP' as any).select('tema, ordem, "capa-aula", "aula-link"').eq('area', areaDecoded).order('ordem');
       if (error) throw error;
-
-      setTemas((data as any) || []);
+      setTemas(data as any || []);
     } catch (error) {
       console.error('Erro ao carregar temas:', error);
       toast.error('Erro ao carregar temas');
@@ -57,33 +52,20 @@ export default function IniciandoDireitoTemas() {
       setLoading(false);
     }
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center">
         <div className="text-center">
           <PlayCircle className="w-16 h-16 text-primary mx-auto mb-4 animate-pulse" />
           <p className="text-muted-foreground">Carregando temas...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background pb-20">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/iniciando-direito')}
-              className="hover:bg-muted"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Button>
+            
           </div>
           
           <div className="flex items-center gap-3">
@@ -105,60 +87,38 @@ export default function IniciandoDireitoTemas() {
           {/* Linha vertical */}
           <div className="absolute left-[9px] top-0 bottom-0 w-0.5 bg-border" />
 
-          {temas.map((temaData, index) => (
-            <div 
-              key={index} 
-              className="relative pl-8 animate-fade-in-up"
-              style={{ 
-                animationDelay: `${index * 0.12}s`,
-                animationFillMode: 'backwards'
-              }}
-            >
+          {temas.map((temaData, index) => <div key={index} className="relative pl-8 animate-fade-in-up" style={{
+          animationDelay: `${index * 0.12}s`,
+          animationFillMode: 'backwards'
+        }}>
               {/* Marcador colorido com animação */}
-              <div 
-                className={`absolute left-0 top-4 w-7 h-7 rounded-full ${corArea} border-4 border-background flex items-center justify-center shadow-xl animate-bounce-in`}
-                style={{ 
-                  animationDelay: `${index * 0.12 + 0.3}s`,
-                  animationFillMode: 'backwards'
-                }}
-              >
+              <div className={`absolute left-0 top-4 w-7 h-7 rounded-full ${corArea} border-4 border-background flex items-center justify-center shadow-xl animate-bounce-in`} style={{
+            animationDelay: `${index * 0.12 + 0.3}s`,
+            animationFillMode: 'backwards'
+          }}>
                 <span className="text-xs font-bold text-white">{temaData.ordem}</span>
               </div>
               
               {/* Card do tema com gradiente de fundo */}
-              <button
-                onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}/${encodeURIComponent(temaData.tema)}`)}
-                className="w-full text-left relative overflow-hidden backdrop-blur-sm border-2 border-border/50 rounded-lg hover:border-primary hover:shadow-2xl shadow-xl transition-all duration-300 group hover:scale-[1.02]"
-                style={{
-                  background: `linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 70%, ${corArea.replace('bg-', '')} 100%)`,
-                }}
-              >
+              <button onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}/${encodeURIComponent(temaData.tema)}`)} className="w-full text-left relative overflow-hidden backdrop-blur-sm border-2 border-border/50 rounded-lg hover:border-primary hover:shadow-2xl shadow-xl transition-all duration-300 group hover:scale-[1.02]" style={{
+            background: `linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 70%, ${corArea.replace('bg-', '')} 100%)`
+          }}>
                 {/* Shimmer effect on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500"
-                  style={{
-                    background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)`,
-                    backgroundSize: '200% 100%',
-                  }}
-                />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500" style={{
+              background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)`,
+              backgroundSize: '200% 100%'
+            }} />
                 
                 {/* Imagem de capa */}
-                {temaData['capa-aula'] && (
-                  <div className="relative h-40 overflow-hidden bg-muted">
-                    <img
-                      src={temaData['capa-aula']}
-                      alt={temaData.tema}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
+                {temaData['capa-aula'] && <div className="relative h-40 overflow-hidden bg-muted">
+                    <img src={temaData['capa-aula']} alt={temaData.tema} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onError={e => {
+                e.currentTarget.style.display = 'none';
+              }} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                    <div className="absolute top-3 right-3 animate-bounce-in"
-                      style={{ 
-                        animationDelay: `${index * 0.12 + 0.5}s`,
-                        animationFillMode: 'backwards'
-                      }}
-                    >
+                    <div className="absolute top-3 right-3 animate-bounce-in" style={{
+                animationDelay: `${index * 0.12 + 0.5}s`,
+                animationFillMode: 'backwards'
+              }}>
                       <div className={`${corArea} text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg`}>
                         Aula {temaData.ordem}
                       </div>
@@ -166,8 +126,7 @@ export default function IniciandoDireitoTemas() {
                     <div className="absolute bottom-3 left-3 right-3">
                       <PlayCircle className="w-10 h-10 text-white opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 drop-shadow-lg" />
                     </div>
-                  </div>
-                )}
+                  </div>}
 
                 {/* Conteúdo */}
                 <div className="p-5 relative z-10">
@@ -187,16 +146,12 @@ export default function IniciandoDireitoTemas() {
                   </div>
                 </div>
               </button>
-            </div>
-          ))}
+            </div>)}
         </div>
 
-        {temas.length === 0 && (
-          <div className="text-center py-12">
+        {temas.length === 0 && <div className="text-center py-12">
             <p className="text-muted-foreground">Nenhum tema encontrado para esta área.</p>
-          </div>
-        )}
+          </div>}
       </div>
-    </div>
-  );
+    </div>;
 }
