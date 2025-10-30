@@ -10,6 +10,7 @@ import remarkGfm from "remark-gfm";
 import { ContentGenerationLoader } from "@/components/ContentGenerationLoader";
 import { FlashcardViewer } from "@/components/FlashcardViewer";
 import { QuizViewer } from "@/components/QuizViewer";
+import { AulaTransitionCard } from "@/components/aula/AulaTransitionCard";
 interface AulaData {
   tema: string;
   ordem: number;
@@ -50,6 +51,8 @@ export default function IniciandoDireitoAula() {
     ordem: number;
   }[]>([]);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [mostrarTransicao, setMostrarTransicao] = useState(false);
+  const [proximaAulaInfo, setProximaAulaInfo] = useState<{ numero: number; tema: string } | null>(null);
   const conteudoRef = useRef<HTMLDivElement>(null);
   const areaDecoded = area ? decodeURIComponent(area) : '';
   const temaDecoded = tema ? decodeURIComponent(tema) : '';
@@ -129,7 +132,19 @@ export default function IniciandoDireitoAula() {
     const indiceAtual = todasAulas.findIndex(a => a.tema === temaDecoded);
     if (indiceAtual < todasAulas.length - 1) {
       const proximaAula = todasAulas[indiceAtual + 1];
-      navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}/${encodeURIComponent(proximaAula.tema)}`);
+      setProximaAulaInfo({
+        numero: proximaAula.ordem,
+        tema: proximaAula.tema
+      });
+      setMostrarTransicao(true);
+    }
+  };
+
+  const completarTransicao = () => {
+    if (proximaAulaInfo) {
+      navigate(`/iniciando-direito/${encodeURIComponent(areaDecoded)}/${encodeURIComponent(proximaAulaInfo.tema)}`);
+      setMostrarTransicao(false);
+      setProximaAulaInfo(null);
     }
   };
   const navegarAulaAnterior = () => {
@@ -280,7 +295,11 @@ export default function IniciandoDireitoAula() {
                 Aula Anterior
               </Button>
 
-              <Button onClick={navegarProximaAula} disabled={!temProxima} className="flex-1">
+              <Button 
+                onClick={navegarProximaAula} 
+                disabled={!temProxima} 
+                className="flex-1 bg-primary/70 hover:bg-primary/80"
+              >
                 Próxima Aula
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
@@ -293,5 +312,14 @@ export default function IniciandoDireitoAula() {
             <ArrowUp className="w-5 h-5" />
           </Button>}
       </div>
+
+      {/* Transição de Aula */}
+      {mostrarTransicao && proximaAulaInfo && (
+        <AulaTransitionCard
+          aulaNumero={proximaAulaInfo.numero}
+          aulaTema={proximaAulaInfo.tema}
+          onComplete={completarTransicao}
+        />
+      )}
     </div>;
 }
