@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Pause, Loader2 } from "lucide-react";
+import { Pause, Loader2, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNarrationPlayer } from "@/contexts/NarrationPlayerContext";
 import AudioWaveAnimation from "./AudioWaveAnimation";
@@ -90,7 +90,7 @@ const InlineAudioButton = ({ audioUrl, articleNumber, onPlay }: InlineAudioButto
       <button
         onClick={togglePlay}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg transition-all text-base font-medium shadow-lg hover:shadow-xl hover:scale-105 animate-fade-in relative overflow-hidden bg-accent/70 hover:bg-accent/90 border border-accent/30 text-white group"
+        className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg transition-all text-base font-medium shadow-lg hover:shadow-xl hover:scale-105 animate-fade-in relative overflow-hidden bg-accent/70 hover:bg-accent/90 border border-accent/30 group"
       >
         {/* Progress Fill */}
         {isPlaying && (
@@ -101,18 +101,23 @@ const InlineAudioButton = ({ audioUrl, articleNumber, onPlay }: InlineAudioButto
         )}
         
         {/* Content */}
-        <div className="relative z-10 flex items-center gap-2">
+        <div className="relative z-10 flex items-center gap-2 text-white">
           {loading ? (
             <Loader2 className="w-5 h-5 animate-spin text-white" />
           ) : isPlaying ? (
             <>
-              <AudioWaveAnimation />
+              <div className="text-white">
+                <AudioWaveAnimation />
+              </div>
               <Pause className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity absolute left-0 text-white" />
             </>
           ) : (
-            <span className="font-medium text-white">
-              {articleNumber}
-            </span>
+            <>
+              <Volume2 className="w-5 h-5 text-white" />
+              <span className="font-medium text-white">
+                Narração
+              </span>
+            </>
           )}
           {isPlaying && (
             <span className="font-medium opacity-0 group-hover:opacity-100 transition-opacity text-white">
