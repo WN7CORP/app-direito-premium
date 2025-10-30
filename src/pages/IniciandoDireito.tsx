@@ -4,14 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
-
 interface AreaData {
   area: string;
   totalTemas: number;
   primeirosTemas: string[];
   cor: string;
 }
-
 const CORES_AREAS: Record<string, string> = {
   "Direito Penal": "bg-red-600",
   "Direito Civil": "bg-blue-600",
@@ -21,40 +19,39 @@ const CORES_AREAS: Record<string, string> = {
   "Direito Empresarial": "bg-pink-600",
   "Direito Tributário": "bg-indigo-600",
   "Direito Processual Civil": "bg-cyan-600",
-  "Direito Processual Penal": "bg-orange-600",
+  "Direito Processual Penal": "bg-orange-600"
 };
-
 export default function IniciandoDireito() {
   const navigate = useNavigate();
   const [areas, setAreas] = useState<AreaData[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     carregarAreas();
   }, []);
-
   const carregarAreas = async () => {
     try {
-      const { data, error } = await supabase
-        .from('CURSOS-APP' as any)
-        .select('area, tema, ordem')
-        .order('area')
-        .order('ordem');
-
+      const {
+        data,
+        error
+      } = await supabase.from('CURSOS-APP' as any).select('area, tema, ordem').order('area').order('ordem');
       if (error) throw error;
-
       if (!data) {
         setAreas([]);
         return;
       }
 
       // Agrupar por área
-      const areasMap = new Map<string, { temas: string[], total: number }>();
-      
+      const areasMap = new Map<string, {
+        temas: string[];
+        total: number;
+      }>();
       data.forEach((row: any) => {
         const area = row.area;
         if (!areasMap.has(area)) {
-          areasMap.set(area, { temas: [], total: 0 });
+          areasMap.set(area, {
+            temas: [],
+            total: 0
+          });
         }
         const areaData = areasMap.get(area)!;
         areaData.temas.push(row.tema);
@@ -66,9 +63,8 @@ export default function IniciandoDireito() {
         area,
         totalTemas: dados.total,
         primeirosTemas: dados.temas.slice(0, 3),
-        cor: CORES_AREAS[area] || 'bg-gray-600',
+        cor: CORES_AREAS[area] || 'bg-gray-600'
       }));
-
       setAreas(areasArray);
     } catch (error) {
       console.error('Erro ao carregar áreas:', error);
@@ -77,33 +73,20 @@ export default function IniciandoDireito() {
       setLoading(false);
     }
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center">
         <div className="text-center">
           <GraduationCap className="w-16 h-16 text-primary mx-auto mb-4 animate-pulse" />
           <p className="text-muted-foreground">Carregando áreas do Direito...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background pb-20">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/aprender')}
-              className="hover:bg-muted"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Button>
+            
           </div>
           
           <div className="flex items-center gap-3">
@@ -142,39 +125,26 @@ export default function IniciandoDireito() {
             {/* Linha vertical */}
             <div className="absolute left-[9px] top-0 bottom-0 w-0.5 bg-border" />
 
-            {areas.map((areaData, index) => (
-              <div 
-                key={areaData.area} 
-                className="relative pl-8 animate-fade-in-up"
-                style={{ 
-                  animationDelay: `${index * 0.15}s`,
-                  animationFillMode: 'backwards'
-                }}
-              >
+            {areas.map((areaData, index) => <div key={areaData.area} className="relative pl-8 animate-fade-in-up" style={{
+            animationDelay: `${index * 0.15}s`,
+            animationFillMode: 'backwards'
+          }}>
                 {/* Marcador colorido com pulso */}
-                <div className={`absolute left-0 top-2 w-5 h-5 rounded-full ${areaData.cor} border-4 border-background shadow-lg animate-glow-pulse`} 
-                  style={{ 
-                    animationDelay: `${index * 0.15 + 0.3}s`
-                  }}
-                />
+                <div className={`absolute left-0 top-2 w-5 h-5 rounded-full ${areaData.cor} border-4 border-background shadow-lg animate-glow-pulse`} style={{
+              animationDelay: `${index * 0.15 + 0.3}s`
+            }} />
                 
                 {/* Card da área com background gradiente */}
-                <button
-                  onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaData.area)}`)}
-                  className={`w-full text-left relative overflow-hidden backdrop-blur-sm border-2 border-border/50 rounded-lg p-5 hover:border-primary hover:shadow-2xl shadow-lg transition-all duration-300 group hover:scale-[1.02]`}
-                  style={{
-                    background: `linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 80%, ${areaData.cor.replace('bg-', '')} 100%)`,
-                    backgroundSize: '200% 200%',
-                    backgroundPosition: '0% 0%',
-                  }}
-                >
+                <button onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaData.area)}`)} className={`w-full text-left relative overflow-hidden backdrop-blur-sm border-2 border-border/50 rounded-lg p-5 hover:border-primary hover:shadow-2xl shadow-lg transition-all duration-300 group hover:scale-[1.02]`} style={{
+              background: `linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 80%, ${areaData.cor.replace('bg-', '')} 100%)`,
+              backgroundSize: '200% 200%',
+              backgroundPosition: '0% 0%'
+            }}>
                   {/* Shimmer effect on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
-                    style={{
-                      background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)`,
-                      backgroundSize: '200% 100%',
-                    }}
-                  />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300" style={{
+                background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)`,
+                backgroundSize: '200% 100%'
+              }} />
                   
                   <div className="relative z-10">
                     <div className="flex items-start justify-between mb-3">
@@ -186,12 +156,10 @@ export default function IniciandoDireito() {
                           {areaData.totalTemas} {areaData.totalTemas === 1 ? 'tema' : 'temas'} disponíveis
                         </p>
                       </div>
-                      <span className={`${areaData.cor} text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-md animate-bounce-in`}
-                        style={{ 
-                          animationDelay: `${index * 0.15 + 0.5}s`,
-                          animationFillMode: 'backwards'
-                        }}
-                      >
+                      <span className={`${areaData.cor} text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-md animate-bounce-in`} style={{
+                    animationDelay: `${index * 0.15 + 0.5}s`,
+                    animationFillMode: 'backwards'
+                  }}>
                         {index + 1}
                       </span>
                     </div>
@@ -201,12 +169,10 @@ export default function IniciandoDireito() {
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                         Primeiros temas:
                       </p>
-                      {areaData.primeirosTemas.map((tema, i) => (
-                        <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                      {areaData.primeirosTemas.map((tema, i) => <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                           <span className="text-primary mt-1">•</span>
                           <span className="flex-1">{tema}</span>
-                        </div>
-                      ))}
+                        </div>)}
                     </div>
 
                     <div className="mt-4 text-right">
@@ -216,11 +182,9 @@ export default function IniciandoDireito() {
                     </div>
                   </div>
                 </button>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
