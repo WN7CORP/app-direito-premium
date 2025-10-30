@@ -12,56 +12,48 @@ interface PDFReaderModeSelectorProps {
 const PDFReaderModeSelector = ({ isOpen, onClose, onSelectMode, bookTitle }: PDFReaderModeSelectorProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Como você quer ler este livro?
+      <DialogContent className="max-w-lg p-4 sm:p-6">
+        <DialogHeader className="space-y-2 pb-2">
+          <DialogTitle className="text-center text-lg sm:text-xl font-bold">
+            Como você quer ler?
           </DialogTitle>
-          <p className="text-sm text-muted-foreground text-center mt-2">{bookTitle}</p>
+          <p className="text-xs text-muted-foreground text-center line-clamp-1">{bookTitle}</p>
         </DialogHeader>
         
-        <div className="grid grid-cols-2 gap-6 py-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <Card 
-            className="group relative p-8 cursor-pointer transition-all duration-300 border-2 hover:border-primary hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1 overflow-hidden"
+            className="group relative p-4 sm:p-6 cursor-pointer transition-all duration-300 border-2 hover:border-primary hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
             onClick={() => onSelectMode('normal')}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative flex flex-col items-center text-center gap-4">
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 group-hover:scale-110 transition-transform duration-300">
-                <BookOpen className="w-12 h-12 text-primary" />
+            <div className="flex flex-col items-center text-center gap-2 sm:gap-3">
+              <div className="p-3 sm:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <BookOpen className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold text-xl mb-2 group-hover:text-primary transition-colors">
-                  📖 Modo Páginas
+                <h3 className="font-bold text-sm sm:text-base mb-1">
+                  Páginas
                 </h3>
-                <p className="text-sm text-muted-foreground font-medium">
-                  Experiência como um livro físico
-                </p>
-                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                  Virar páginas, ideal para livros completos e leitura tradicional
+                <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
+                  Virar páginas
                 </p>
               </div>
             </div>
           </Card>
 
           <Card 
-            className="group relative p-8 cursor-pointer transition-all duration-300 border-2 hover:border-primary hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1 overflow-hidden"
+            className="group relative p-4 sm:p-6 cursor-pointer transition-all duration-300 border-2 hover:border-primary hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
             onClick={() => onSelectMode('vertical')}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative flex flex-col items-center text-center gap-4">
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 group-hover:scale-110 transition-transform duration-300">
-                <ScrollText className="w-12 h-12 text-accent" />
+            <div className="flex flex-col items-center text-center gap-2 sm:gap-3">
+              <div className="p-3 sm:p-4 rounded-xl bg-accent/10 group-hover:bg-accent/20 transition-colors">
+                <ScrollText className="w-8 h-8 sm:w-10 sm:h-10 text-accent" />
               </div>
               <div>
-                <h3 className="font-bold text-xl mb-2 group-hover:text-accent transition-colors">
-                  📜 Modo Vertical
+                <h3 className="font-bold text-sm sm:text-base mb-1">
+                  Vertical
                 </h3>
-                <p className="text-sm text-muted-foreground font-medium">
-                  Leitura contínua e rápida
-                </p>
-                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                  Scroll contínuo, ideal para artigos e PDFs técnicos
+                <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
+                  Scroll contínuo
                 </p>
               </div>
             </div>
