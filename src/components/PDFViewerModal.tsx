@@ -64,11 +64,65 @@ const PDFViewerModal = ({ isOpen, onClose, normalModeUrl, verticalModeUrl, title
   // Aplicar zoom ao iframe
   useEffect(() => {
     if (iframeRef.current && viewMode === 'vertical') {
-      iframeRef.current.style.transform = `scale(${zoomLevel / 100})`;
-      iframeRef.current.style.transformOrigin = 'top center';
-      iframeRef.current.style.width = `${100 / (zoomLevel / 100)}%`;
+      const container = iframeRef.current.parentElement;
+      if (container) {
+        container.style.transform = `scale(${zoomLevel / 100})`;
+        container.style.transformOrigin = 'top center';
+        container.style.transition = 'transform 0.2s ease-out';
+      }
     }
   }, [zoomLevel, viewMode]);
+  
+  // Suporte para pinch-to-zoom (gestos de pinça)
+  useEffect(() => {
+    if (!iframeRef.current || viewMode !== 'vertical') return;
+    
+    const container = iframeRef.current.parentElement;
+    if (!container) return;
+    
+    let initialDistance = 0;
+    let initialZoom = zoomLevel;
+    
+    const getDistance = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+    
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        initialDistance = getDistance(e.touches);
+        initialZoom = zoomLevel;
+      }
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = getDistance(e.touches);
+        const scale = currentDistance / initialDistance;
+        const newZoom = Math.min(Math.max(initialZoom * scale, 50), 200);
+        setZoomLevel(Math.round(newZoom));
+      }
+    };
+    
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        initialDistance = 0;
+      }
+    };
+    
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd);
+    
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [viewMode, zoomLevel]);
   
   // Monitorar progresso de leitura
   useEffect(() => {
@@ -264,12 +318,13 @@ const PDFViewerModal = ({ isOpen, onClose, normalModeUrl, verticalModeUrl, title
           )}
           
           {/* Conteúdo do PDF */}
-          <div className="flex-1 overflow-hidden relative">
+          <div className="flex-1 overflow-auto relative">
             <div 
-              className="h-full flex justify-center"
+              className="h-full flex justify-center touch-pan-y"
               style={{ 
-                width: isVerticalMode ? `${textWidth}%` : '100%',
-                margin: '0 auto'
+                width: '100%',
+                margin: '0 auto',
+                minHeight: '100%'
               }}
             >
               <iframe
@@ -277,6 +332,9 @@ const PDFViewerModal = ({ isOpen, onClose, normalModeUrl, verticalModeUrl, title
                 src={processedUrl}
                 className="w-full h-full"
                 title={title}
+                style={{
+                  touchAction: 'pan-y pinch-zoom'
+                }}
               />
             </div>
             
@@ -285,21 +343,24 @@ const PDFViewerModal = ({ isOpen, onClose, normalModeUrl, verticalModeUrl, title
               <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-40">
                 <Button
                   onClick={handleZoomIn}
-                  size="sm"
+                  size="icon"
                   variant="secondary"
-                  className="shadow-lg"
+                  className="shadow-lg h-12 w-12 rounded-full touch-manipulation"
                   title="Aumentar zoom"
                 >
-                  <ZoomIn className="w-4 h-4" />
+                  <ZoomIn className="w-5 h-5" />
                 </Button>
+                <div className="bg-secondary/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-center">
+                  {zoomLevel}%
+                </div>
                 <Button
                   onClick={handleZoomOut}
-                  size="sm"
+                  size="icon"
                   variant="secondary"
-                  className="shadow-lg"
+                  className="shadow-lg h-12 w-12 rounded-full touch-manipulation"
                   title="Diminuir zoom"
                 >
-                  <ZoomOut className="w-4 h-4" />
+                  <ZoomOut className="w-5 h-5" />
                 </Button>
               </div>
             )}
