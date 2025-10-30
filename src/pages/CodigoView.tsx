@@ -604,7 +604,7 @@ const CodigoView = () => {
 
       {/* Floating Controls - Only visible when content is showing on artigos tab */}
       {activeTab === 'artigos' && displayedArticles.length > 0 && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[60rem] px-4 flex justify-between z-30 pointer-events-none">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[60rem] px-4 flex justify-between z-30 pointer-events-none">
           {/* Font size controls on the left */}
           <div className="flex flex-col gap-2 animate-fade-in pointer-events-auto">
             <button onClick={increaseFontSize} className="bg-accent hover:bg-accent/90 text-accent-foreground w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">

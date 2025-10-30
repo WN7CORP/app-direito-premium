@@ -573,7 +573,7 @@ const EstatutoView = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-20 right-4 z-30 animate-fade-in">
+      <div className="fixed bottom-4 right-4 z-30 animate-fade-in">
         <button onClick={scrollToTop} className="bg-accent hover:bg-accent/90 text-accent-foreground w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">
           <ArrowUp className="w-5 h-5" />
         </button>
