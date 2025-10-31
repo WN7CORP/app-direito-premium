@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 
 interface CursoData {
   area: string;
@@ -15,6 +16,7 @@ interface CursoData {
 }
 
 const CACHE_KEY_CURSOS = 'cursos_app_cache';
+const CACHE_VERSION = '2'; // Incrementar para forçar reload
 const CACHE_DURATION = 1000 * 60 * 60 * 24; // 24 horas
 
 export const useCursosCache = () => {
@@ -49,32 +51,31 @@ export const useCursosCache = () => {
 
   const loadCursos = async () => {
     try {
-      // 1. Verificar cache
+      // 1. Verificar cache com versão
       const cached = localStorage.getItem(CACHE_KEY_CURSOS);
       if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_DURATION) {
+        const { data, timestamp, version } = JSON.parse(cached);
+        if (version === CACHE_VERSION && Date.now() - timestamp < CACHE_DURATION) {
+          console.log('📚 Usando cursos do cache (v' + version + '), total:', data.length);
           setCursos(data);
           setLoading(false);
           return;
         }
       }
 
-      // 2. Buscar do Supabase
-      const { data, error } = await supabase
-        .from('CURSOS-APP' as any)
-        .select('*')
-        .order('ordem', { ascending: true });
+      // 2. Buscar todos os cursos do Supabase (sem limite de 1000)
+      console.log('🔄 Buscando todos os cursos do Supabase...');
+      const data = await fetchAllRows<CursoData>('CURSOS-APP', 'ordem');
 
-      if (error) throw error;
-
-      // 3. Salvar no cache
+      // 3. Salvar no cache com versão
       localStorage.setItem(CACHE_KEY_CURSOS, JSON.stringify({
-        data: data || [],
-        timestamp: Date.now()
+        data: data,
+        timestamp: Date.now(),
+        version: CACHE_VERSION
       }));
 
-      setCursos(data as any || []);
+      console.log('✅ Cursos carregados:', data.length);
+      setCursos(data);
     } catch (error) {
       console.error('Erro ao carregar cursos:', error);
     } finally {
