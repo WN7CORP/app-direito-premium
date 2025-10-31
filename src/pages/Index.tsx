@@ -209,11 +209,11 @@ const Index = () => {
                 Descomplicando o Direito
               </p>
             </div>
-            <button 
-              onClick={() => navigate("/iniciando-direito")} 
-              className="text-accent font-medium flex items-center text-sm md:text-xs hover:underline"
+            <button
+              onClick={() => navigate("/iniciando-direito")}
+              className="px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium text-sm"
             >
-              Ver todos <span className="text-lg md:text-base ml-0.5">›</span>
+              Acessar
             </button>
           </div>
           

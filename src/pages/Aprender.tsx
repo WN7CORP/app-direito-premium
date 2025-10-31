@@ -281,11 +281,19 @@ const Aprender = () => {
 
       {/* Seção Cursos em Destaque */}
       <div className="mt-12">
-        <div className="mb-4">
-          <h2 className="text-xl md:text-2xl font-bold mb-2">Cursos em Destaque</h2>
-          <p className="text-sm text-muted-foreground">
-            Descomplicando o Direito
-          </p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl md:text-2xl font-bold mb-2">Cursos em Destaque</h2>
+            <p className="text-sm text-muted-foreground">
+              Descomplicando o Direito
+            </p>
+          </div>
+          <button
+            onClick={() => navigate("/iniciando-direito")}
+            className="px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium text-sm"
+          >
+            Acessar
+          </button>
         </div>
         
         <CursosCarousel />
