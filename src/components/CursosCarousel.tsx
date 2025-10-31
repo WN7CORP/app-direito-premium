@@ -92,7 +92,7 @@ export const CursosCarousel = () => {
               className="flex-shrink-0 w-[240px] cursor-pointer hover:scale-105 transition-all duration-300 group"
             >
               <div 
-                className="relative aspect-[3/4] rounded-xl overflow-hidden border-2 shadow-lg hover:shadow-2xl transition-all duration-300"
+                className="relative rounded-xl overflow-hidden border-2 shadow-lg hover:shadow-2xl transition-all duration-300"
                 style={{
                   backgroundColor: curso.corHex + '20',
                   borderColor: curso.corHex + '40'
@@ -104,7 +104,7 @@ export const CursosCarousel = () => {
                     <img 
                       src={curso.capaAula} 
                       alt={curso.tema}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
                     />
                     {/* Gradient overlay de baixo para cima - mais forte embaixo */}
                     <div 
