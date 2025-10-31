@@ -65,7 +65,7 @@ const ProposicaoCarouselCard = ({
   return (
     <Card
       onClick={onClick}
-      className="flex-[0_0_40%] md:flex-[0_0_30%] min-w-0 overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:shadow-2xl border border-border hover:border-accent/50 shadow-lg bg-card"
+      className="flex-[0_0_40%] md:flex-[0_0_30%] lg:flex-[0_0_18%] min-w-0 overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:shadow-2xl border border-border hover:border-accent/50 shadow-lg bg-card"
     >
       {/* Foto do autor */}
       <div className="aspect-square relative bg-secondary overflow-hidden">
