@@ -131,7 +131,7 @@ export const CursosCarousel = () => {
               <p className="text-xs text-muted-foreground mb-1">
                 {curso.area}
               </p>
-              <h3 className="font-bold text-sm leading-tight line-clamp-2 text-foreground/80">
+              <h3 className="font-bold text-sm leading-tight line-clamp-2 text-foreground">
                 {curso.tema}
               </h3>
             </div>
