@@ -643,9 +643,9 @@ const ChatProfessora = () => {
         setMessages(prev => prev.slice(0, -1));
       }
     } finally {
-      if (streamMode === 'chat') {
-        setIsLoading(false);
-      } else {
+      // Finalização de estados de carregamento
+      setIsLoading(false); // tanto para 'chat' quanto para 'analyze'
+      if (streamMode === 'lesson') {
         setIsCreatingLesson(false);
       }
       abortControllerRef.current = null;
