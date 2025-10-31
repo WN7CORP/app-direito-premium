@@ -396,6 +396,8 @@ const ChatProfessora = () => {
         });
         console.log('✅ Mensagem do assistente criada/atualizada');
         setUploadedFiles([]);
+        if (imageInputRef.current) imageInputRef.current.value = '';
+        if (pdfInputRef.current) pdfInputRef.current.value = '';
         setThinkingStartTime(null);
         clearInterval(watchdogInterval);
         setIsLoading(false);
@@ -566,6 +568,8 @@ const ChatProfessora = () => {
                   return next;
                 });
                 setUploadedFiles([]);
+                if (imageInputRef.current) imageInputRef.current.value = '';
+                if (pdfInputRef.current) pdfInputRef.current.value = '';
                 setThinkingStartTime(null);
                 sonnerToast.info('Resposta recebida sem streaming', {
                   description: 'A resposta foi obtida com sucesso.'
@@ -598,6 +602,8 @@ const ChatProfessora = () => {
         return newMessages;
       });
       setUploadedFiles([]);
+      if (imageInputRef.current) imageInputRef.current.value = '';
+      if (pdfInputRef.current) pdfInputRef.current.value = '';
       setThinkingStartTime(null);
       clearInterval(watchdogInterval);
     } catch (error: any) {

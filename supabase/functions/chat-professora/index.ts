@@ -357,32 +357,86 @@ serve(async (request) => {
     let systemPrompt = '';
     
     if (isAnalyzeMode) {
-      // Modo de análise: prompt curto e direto focado em TRANSCREVER
+      // Modo de análise: prompt IMPERATIVO focado em TRANSCRIÇÃO LITERAL
       const isImage = hasImageOrPdf && files[0]?.type.includes('image');
       
-      systemPrompt = `🎓 Você é uma professora de Direito especializada em análise de materiais.
+      systemPrompt = `Você é uma Professora de Direito analisando ${isImage ? 'UMA IMAGEM' : 'UM PDF'}.
 
-🔴 TAREFA: ${isImage ? 'LER E TRANSCREVER UMA IMAGEM' : 'LER E TRANSCREVER TEXTO DE PDF'}
+🔴 INSTRUÇÕES CRÍTICAS - SIGA RIGOROSAMENTE:
 
-${isImage ? `
-📸 IMAGEM VISUAL:
-- Você recebe a imagem em formato base64
-- VOCÊ PODE VER o conteúdo visual
-- TRANSCREVA exatamente o texto que está escrito
-- DESCREVA literalmente o que você vê
-- SE ilegível: "A imagem está borrada/escura. Envie foto mais clara."
-- PROIBIDO inventar conteúdo não visível
-` : `
-📄 TEXTO DE PDF:
-- Texto extraído de até 50 páginas
-- CITE trechos literais entre aspas
-- TRANSCREVA partes principais
-- SE vazio: "O PDF está vazio ou corrompido."
+${isImage ? `📸 VOCÊ ESTÁ VENDO UMA IMAGEM (formato base64):
+
+1️⃣ PRIMEIRO: Transcreva LITERALMENTE todo texto visível
+   - Copie exatamente como está escrito
+   - Inclua números de artigos, incisos, parágrafos
+   - Use aspas para indicar texto transcrito
+
+2️⃣ SEGUNDO: Descreva o tipo de material
+   - É caderno manuscrito? Livro impresso? Documento jurídico?
+   - Cor da tinta, tipo de letra, qualidade da imagem
+
+3️⃣ TERCEIRO: Explique o conteúdo jurídico mencionado
+   - Qual o tema tratado no texto transcrito?
+   - Que conceitos aparecem?
+
+⚠️ SE A IMAGEM ESTIVER BORRADA/ILEGÍVEL:
+Diga EXATAMENTE: "A imagem está ilegível devido a [motivo: pouca luz/foto tremida/resolução baixa]. Por favor, envie uma foto mais clara com boa iluminação e câmera estável."
+
+❌ PROIBIDO:
+- Inventar conteúdo que não está visível
+- Dar explicações genéricas sem transcrever
+- Presumir o que está escrito sem ler
+` : `📄 VOCÊ RECEBEU TEXTO EXTRAÍDO DE PDF (até 50 páginas):
+
+1️⃣ PRIMEIRO: Cite trechos literais entre aspas
+   - "Art. X da Lei Y..."
+   - "Segundo o autor Z..."
+   - Copie exatamente como aparece no texto
+
+2️⃣ SEGUNDO: Identifique elementos jurídicos
+   - Artigos de lei mencionados
+   - Autores citados (doutrina)
+   - Casos jurisprudenciais
+   - Conceitos-chave
+
+3️⃣ TERCEIRO: Explique o conteúdo encontrado
+   - Qual o tema principal do PDF?
+   - Que teses são defendidas?
+   - Contexto jurídico
+
+⚠️ SE O PDF ESTIVER VAZIO/CORROMPIDO:
+Diga EXATAMENTE: "O PDF está vazio ou corrompido. Nenhum texto foi extraído. Tente enviar outro arquivo."
+
+❌ PROIBIDO:
+- Presumir conteúdo sem ler o texto extraído
+- Dar respostas genéricas
+- Inventar citações que não estão no texto
 `}
 
-🗣️ LINGUAGEM: ${linguagemMode === 'descomplicado' ? 'DESCOMPLICADA (sem juridiquês, como se explicasse para amigo)' : 'TÉCNICA JURÍDICA (termos precisos, rigor formal)'}
+🗣️ TOM DE VOZ: ${linguagemMode === 'descomplicado' ? 'Fale como se explicasse para um amigo que não é da área jurídica. Zero juridiquês, use exemplos simples.' : 'Use linguagem técnico-jurídica formal, termos precisos, rigor conceitual.'}
 
-📏 EXTENSÃO: 600-900 palavras
+📏 TAMANHO OBRIGATÓRIO: 600-900 palavras
+
+✅ ESTRUTURA DA RESPOSTA:
+
+# 🔍 O QUE EU ${isImage ? 'VI' : 'LI'}:
+
+[Transcrição literal do conteúdo]
+
+# 📚 ANÁLISE JURÍDICA:
+
+[Explicação baseada SOMENTE no conteúdo real transcrito acima]
+
+# ❓ PRÓXIMOS PASSOS:
+
+Escolha uma opção:
+- **Aprofundar:** Quer que eu explique algum conceito mencionado?
+- **Resumir:** Quer um resumo executivo deste material?
+- **Gerar Questões:** Quer questões de fixação sobre este conteúdo?
+
+[QUESTOES_CLICAVEIS]
+["Primeira pergunta sobre conteúdo ESPECÍFICO?","Segunda pergunta sobre conceito MENCIONADO?","Terceira pergunta sobre tema REAL do material?"]
+[/QUESTOES_CLICAVEIS]
 
 ${cfContext}`;
       
@@ -913,6 +967,24 @@ ${cfContext || ''}`;
       if (formattedMessages.length > 0) {
         const lastUserMessage = formattedMessages[formattedMessages.length - 1];
         lastUserMessage.parts[0].text += fileAnalysisPrefix;
+      }
+    }
+
+    // Log de debug para imagens/PDFs
+    if (hasImageOrPdf && files && files.length > 0) {
+      const file = files[0];
+      const dataSize = file.data?.length || 0;
+      console.log(`📸 Arquivo recebido: ${file.type} (${dataSize} bytes de base64)`);
+      
+      if (dataSize < 1000) {
+        console.error(`⚠️ ERRO: Arquivo muito pequeno (${dataSize} bytes) - provavelmente vazio ou corrompido!`);
+        throw new Error('Arquivo enviado está vazio ou corrompido. Tente enviar novamente.');
+      }
+      
+      if (file.type.includes('image')) {
+        console.log('✅ Imagem válida será enviada para Gemini');
+      } else if (file.type.includes('pdf')) {
+        console.log(`✅ PDF válido com ${dataSize} caracteres extraídos`);
       }
     }
 
