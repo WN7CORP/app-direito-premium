@@ -43,10 +43,14 @@ export const useCursosCache = () => {
       const { data, error } = await supabase
         .from('CURSOS-APP' as any)
         .select('*')
-        .order('area')
-        .order('ordem');
+        .order('ordem', { ascending: true });
 
       if (error) throw error;
+
+      console.log('📊 Total de cursos carregados:', data?.length);
+      if (data && data.length > 0) {
+        console.log('📚 Áreas disponíveis:', [...new Set(data.map((c: any) => c.area))]);
+      }
 
       // 3. Salvar no cache
       localStorage.setItem(CACHE_KEY_CURSOS, JSON.stringify({

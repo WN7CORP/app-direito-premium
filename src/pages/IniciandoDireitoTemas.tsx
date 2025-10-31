@@ -31,13 +31,16 @@ export default function IniciandoDireitoTemas() {
   }>();
   const [temas, setTemas] = useState<TemaData[]>([]);
   const [loading, setLoading] = useState(true);
-  const { cursos, loading: cursosLoading } = useCursosCache();
+  const { cursos, loading: cursosLoading, invalidateCache } = useCursosCache();
   
   const areaDecoded = area ? decodeURIComponent(area) : '';
   const corArea = CORES_AREAS[areaDecoded] || 'bg-gray-600';
 
   useEffect(() => {
     if (!cursosLoading && areaDecoded) {
+      console.log('🔍 Filtrando cursos para área:', areaDecoded);
+      console.log('📦 Total de cursos disponíveis:', cursos.length);
+      
       const temasArea = cursos
         .filter(c => c.area === areaDecoded)
         .map(c => ({
@@ -46,6 +49,8 @@ export default function IniciandoDireitoTemas() {
           'capa-aula': c['capa-aula'],
           'aula-link': c['aula-link']
         }));
+      
+      console.log('✅ Temas encontrados para', areaDecoded + ':', temasArea.length);
       setTemas(temasArea);
       setLoading(false);
     }
@@ -88,7 +93,23 @@ export default function IniciandoDireitoTemas() {
       <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-[600px] lg:max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/iniciando-direito')} className="gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </Button>
             
+            {/* Botão temporário de debug */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                console.log('🔄 Forçando atualização do cache...');
+                invalidateCache();
+              }}
+              className="text-xs"
+            >
+              🔄 Atualizar
+            </Button>
           </div>
           
           <div className="flex items-center gap-3">
