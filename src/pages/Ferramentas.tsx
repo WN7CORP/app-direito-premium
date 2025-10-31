@@ -72,7 +72,7 @@ const Ferramentas = () => {
   ];
 
   return (
-    <div className="px-3 py-4 max-w-4xl mx-auto pb-20">
+    <div className="px-3 py-4 max-w-6xl mx-auto pb-20">
       <div className="mb-6">
         <h1 className="text-xl md:text-2xl font-bold mb-1">Ferramentas</h1>
         <p className="text-sm text-muted-foreground">
@@ -80,7 +80,7 @@ const Ferramentas = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {ferramentas.map((ferramenta) => {
           const Icon = ferramenta.icon;
           return (

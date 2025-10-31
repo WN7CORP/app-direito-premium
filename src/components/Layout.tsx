@@ -75,31 +75,74 @@ export const Layout = ({ children }: LayoutProps) => {
     const isResumoView = location.pathname.includes('/resumos-juridicos/prontos/') && 
                          location.pathname.split('/').length > 4;
 
+    // Sistema de Layout Variável por Rota
+    const getLayoutConfig = () => {
+      const path = location.pathname;
+      
+      // Páginas com layout completo (sidebar + chat)
+      if (path === '/' || path === '/aprender' || path === '/ferramentas') {
+        return { 
+          showLeftSidebar: true,
+          showRightPanel: true,
+          contentMaxWidth: 'max-w-7xl'
+        };
+      }
+      
+      // Notícias - layout mais largo sem chat
+      if (path === '/noticias-juridicas' || path.startsWith('/noticias-juridicas/')) {
+        return {
+          showLeftSidebar: true,
+          showRightPanel: false,
+          contentMaxWidth: 'max-w-full px-6'
+        };
+      }
+
+      // Novidades - centralizado
+      if (path === '/novidades') {
+        return {
+          showLeftSidebar: true,
+          showRightPanel: true,
+          contentMaxWidth: 'max-w-5xl'
+        };
+      }
+      
+      // Default: sidebar + chat
+      return { 
+        showLeftSidebar: true,
+        showRightPanel: true,
+        contentMaxWidth: 'max-w-7xl'
+      };
+    };
+
+    const layout = getLayoutConfig();
+
     return (
       <div className="h-screen flex flex-col w-full bg-background text-foreground">
         <DesktopTopNav />
         
         <div className="flex-1 flex overflow-hidden w-full">
           {/* Sidebar Esquerda - CONDICIONAL */}
-          <div className="w-64 flex-shrink-0">
-            {isVideoPlayer ? (
-              <VideoPlaylistSidebar />
-            ) : isResumoView ? (
-              <ResumosSidebar />
-            ) : (
-              <AppSidebar />
-            )}
-          </div>
+          {layout.showLeftSidebar && (
+            <div className="w-64 flex-shrink-0">
+              {isVideoPlayer ? (
+                <VideoPlaylistSidebar />
+              ) : isResumoView ? (
+                <ResumosSidebar />
+              ) : (
+                <AppSidebar />
+              )}
+            </div>
+          )}
 
           {/* Conteúdo Central */}
           <main className="flex-1 overflow-y-auto">
-            <div className="max-w-7xl mx-auto">
+            <div className={`${layout.contentMaxWidth} mx-auto`}>
               {children}
             </div>
           </main>
 
-          {/* Chat Panel Direita - Escondido quando modal Professora aberto */}
-          {!professoraModalOpen && <DesktopChatPanel />}
+          {/* Chat Panel Direita - CONDICIONAL */}
+          {layout.showRightPanel && !professoraModalOpen && <DesktopChatPanel />}
         </div>
       </div>
     );

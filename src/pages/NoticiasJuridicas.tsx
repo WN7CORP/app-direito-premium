@@ -72,7 +72,7 @@ const NoticiasJuridicas = () => {
       </div>
 
       {/* Lista de Notícias */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="px-4 py-6">
         {error && <div className="text-center py-12">
             <p className="text-red-500 text-lg mb-2">Erro ao carregar notícias</p>
             <p className="text-muted-foreground text-sm">
@@ -95,7 +95,7 @@ const NoticiasJuridicas = () => {
             <div className="mb-4 text-sm text-muted-foreground">
               {noticiasFiltradas.length} {noticiasFiltradas.length === 1 ? 'notícia encontrada' : 'notícias encontradas'}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
               {noticiasFiltradas.map(noticia => <NoticiaCard key={noticia.id} {...noticia} onClick={() => handleNoticiaClick(noticia)} />)}
             </div>
           </>}
