@@ -127,7 +127,7 @@ export const CursosCarousel = () => {
             </div>
 
             {/* Informações ABAIXO da capa */}
-            <div className="px-1">
+            <div className="bg-card rounded-xl p-3 shadow-lg border border-border">
               <p className="text-xs text-muted-foreground mb-1">
                 {curso.area}
               </p>
