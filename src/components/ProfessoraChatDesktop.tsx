@@ -870,7 +870,7 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
           </div>
 
           {/* Área de Chat Principal */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0">
             {/* Header Simplificado */}
             <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between flex-shrink-0">
               <h1 className="text-xl font-bold">Professora Jurídica</h1>
@@ -879,8 +879,8 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
               </Button>
             </div>
 
-            {/* Messages Area - com altura definida */}
-            <div className="flex-1 overflow-hidden" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+            {/* Messages Area - responsivo sem gap */}
+            <div className="flex-1 overflow-hidden">
               <ScrollArea ref={scrollRef} className="h-full py-4">
                 {messages.length === 0 ? (
                   renderWelcomeScreen()
@@ -903,11 +903,11 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
                           )}
                         >
                           {message.role === "assistant" ? (
-                            <div className="text-[15px] md:text-base">
+                            <div className="text-[14px] leading-[1.5]">
                               {parseSpecialContent(message.content)}
                             </div>
                           ) : (
-                            <p className="whitespace-pre-wrap text-[15px]">{message.content}</p>
+                            <p className="whitespace-pre-wrap text-[14px] leading-[1.5]">{message.content}</p>
                           )}
                         </div>
                       </div>
