@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Book, Search, Lightbulb, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface DicionarioTermo {
   Letra: string | null;
@@ -29,9 +30,11 @@ const Dicionario = () => {
   const [loadingExemplo, setLoadingExemplo] = useState<{ [palavra: string]: boolean }>({});
   const [resultados, setResultados] = useState<DicionarioTermo[]>([]);
   const [sugestoes, setSugestoes] = useState<string[]>([]);
-  const [buscaRealizada, setBuscaRealizada] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
+
+  // Debounce para busca em tempo real
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   // Buscar letras disponíveis apenas
   const { data: letrasDisponiveis = [] } = useQuery({
@@ -53,19 +56,16 @@ const Dicionario = () => {
   const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
   // Função de busca otimizada
-  const realizarBusca = async (termo?: string) => {
-    const termoBusca = termo || searchQuery.trim();
+  const realizarBusca = useCallback(async () => {
+    const termoBusca = debouncedSearch.trim();
     
     if (!termoBusca && !selectedLetter) {
-      toast({
-        title: "Digite um termo ou selecione uma letra",
-        variant: "destructive",
-      });
+      setResultados([]);
+      setSugestoes([]);
       return;
     }
 
     setIsSearching(true);
-    setBuscaRealizada(true);
     setSugestoes([]);
 
     try {
@@ -92,7 +92,20 @@ const Dicionario = () => {
 
       // Se não encontrou nada e tem termo de busca, buscar sugestões
       if (resultadosEncontrados.length === 0 && termoBusca) {
-        await buscarSugestoes(termoBusca);
+        // Buscar sugestões inline
+        const primeiraLetra = termoBusca.charAt(0).toUpperCase();
+        const { data: sugestoesData } = await supabase
+          .from("DICIONARIO" as any)
+          .select("Palavra")
+          .eq("Letra", primeiraLetra)
+          .limit(5);
+
+        const palavrasSimilares = (sugestoesData || [])
+          .map((d: any) => d.Palavra)
+          .filter((p: string) => p && p.toLowerCase().includes(termoBusca.slice(0, 3).toLowerCase()))
+          .slice(0, 3);
+
+        setSugestoes(palavrasSimilares);
       }
     } catch (error) {
       console.error("Erro ao buscar:", error);
@@ -104,31 +117,12 @@ const Dicionario = () => {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [debouncedSearch, selectedLetter, toast]);
 
-  // Buscar sugestões para termos similares
-  const buscarSugestoes = async (termo: string) => {
-    try {
-      // Busca fuzzy: pega termos que começam com as primeiras letras
-      const primeiraLetra = termo.charAt(0).toUpperCase();
-      const { data, error } = await supabase
-        .from("DICIONARIO" as any)
-        .select("Palavra")
-        .eq("Letra", primeiraLetra)
-        .limit(5);
-
-      if (error) throw error;
-
-      const palavrasSimilares = (data as any[])
-        .map(d => d.Palavra)
-        .filter(p => p && p.toLowerCase().includes(termo.slice(0, 3).toLowerCase()))
-        .slice(0, 3);
-
-      setSugestoes(palavrasSimilares);
-    } catch (error) {
-      console.error("Erro ao buscar sugestões:", error);
-    }
-  };
+  // Efeito para busca em tempo real com debounce
+  useEffect(() => {
+    realizarBusca();
+  }, [debouncedSearch, selectedLetter]);
 
   // Agrupar por letra
   const termosPorLetra = useMemo(() => {
@@ -200,21 +194,30 @@ const Dicionario = () => {
         </p>
       </div>
 
-      {/* Seletor de Letras */}
-      <div className="mb-4">
-        <div className="flex flex-wrap gap-1.5 justify-center">
+      {/* Barra de Busca */}
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar termo jurídico..."
+          className="pl-10 h-11 bg-card border-border"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {/* Seletor de Letras - 4 por linha */}
+      <div className="mb-6">
+        <p className="text-xs font-semibold text-muted-foreground mb-3">Buscar por letra:</p>
+        <div className="grid grid-cols-4 gap-2">
           <Badge
             variant={selectedLetter === null ? "default" : "outline"}
             className={cn(
-              "cursor-pointer transition-all",
+              "cursor-pointer transition-all h-10 flex items-center justify-center text-base",
               selectedLetter === null && "bg-accent text-accent-foreground"
             )}
             onClick={() => {
               setSelectedLetter(null);
               setSearchQuery("");
-              setResultados([]);
-              setBuscaRealizada(false);
-              setSugestoes([]);
             }}
           >
             Todas
@@ -226,57 +229,17 @@ const Dicionario = () => {
                 key={letra}
                 variant={selectedLetter === letra ? "default" : "outline"}
                 className={cn(
-                  "cursor-pointer transition-all min-w-[32px] justify-center",
+                  "cursor-pointer transition-all h-10 flex items-center justify-center text-base font-semibold",
                   selectedLetter === letra && "bg-accent text-accent-foreground",
                   !disponivel && "opacity-30 cursor-not-allowed"
                 )}
-                onClick={() => {
-                  if (disponivel) {
-                    setSelectedLetter(letra);
-                    realizarBusca();
-                  }
-                }}
+                onClick={() => disponivel && setSelectedLetter(letra)}
               >
                 {letra}
               </Badge>
             );
           })}
         </div>
-      </div>
-
-      {/* Barra de Busca com Botão */}
-      <div className="flex gap-2 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Digite o termo jurídico..."
-            className="pl-10 h-11 bg-card border-border"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                realizarBusca();
-              }
-            }}
-          />
-        </div>
-        <Button 
-          onClick={() => realizarBusca()}
-          disabled={isSearching}
-          className="h-11 px-6"
-        >
-          {isSearching ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Buscando...
-            </>
-          ) : (
-            <>
-              <Search className="w-4 h-4 mr-2" />
-              Pesquisar
-            </>
-          )}
-        </Button>
       </div>
 
       {/* Sugestões "Você quis dizer?" */}
@@ -290,10 +253,7 @@ const Dicionario = () => {
                   key={sugestao}
                   variant="outline"
                   className="cursor-pointer hover:bg-accent/20 transition-colors"
-                  onClick={() => {
-                    setSearchQuery(sugestao);
-                    realizarBusca(sugestao);
-                  }}
+                  onClick={() => setSearchQuery(sugestao)}
                 >
                   {sugestao}
                 </Badge>
@@ -310,18 +270,7 @@ const Dicionario = () => {
             <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
-      ) : !buscaRealizada ? (
-        /* Estado Inicial */
-        <div className="text-center py-16">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-3">
-            <Book className="w-7 h-7 text-muted-foreground" />
-          </div>
-          <p className="text-base font-semibold mb-1">Dicionário Jurídico</p>
-          <p className="text-sm text-muted-foreground">
-            Digite um termo e clique em Pesquisar, ou selecione uma letra
-          </p>
-        </div>
-      ) : resultados.length === 0 ? (
+      ) : resultados.length === 0 && (searchQuery || selectedLetter) ? (
         /* Nenhum Resultado */
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-3">
@@ -329,6 +278,17 @@ const Dicionario = () => {
           </div>
           <p className="text-sm text-muted-foreground">
             Nenhum termo encontrado
+          </p>
+        </div>
+      ) : resultados.length === 0 ? (
+        /* Estado Inicial */
+        <div className="text-center py-16">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-3">
+            <Book className="w-7 h-7 text-muted-foreground" />
+          </div>
+          <p className="text-base font-semibold mb-1">Dicionário Jurídico</p>
+          <p className="text-sm text-muted-foreground">
+            Digite um termo ou selecione uma letra acima
           </p>
         </div>
       ) : (
