@@ -98,51 +98,77 @@ export const CursosCarousel = () => {
                   borderColor: curso.corHex + '40'
                 }}
               >
-                {/* Gradient background */}
-                <div 
-                  className="absolute inset-0"
-                  style={{
-                    background: `linear-gradient(135deg, ${curso.corHex}30, ${curso.corHex}10)`
-                  }}
-                />
+                {/* Imagem da capa se disponível */}
+                {curso.capaAula ? (
+                  <>
+                    <img 
+                      src={curso.capaAula} 
+                      alt={curso.tema}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    {/* Gradient overlay sobre a imagem */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+                  </>
+                ) : (
+                  <>
+                    {/* Gradient background quando não há capa */}
+                    <div 
+                      className="absolute inset-0"
+                      style={{
+                        background: `linear-gradient(135deg, ${curso.corHex}30, ${curso.corHex}10)`
+                      }}
+                    />
+                  </>
+                )}
                 
                 {/* Icon */}
-                <div className="absolute top-4 left-4">
+                <div className="absolute top-4 left-4 z-10">
                   <div 
-                    className="rounded-full p-2.5 shadow-lg"
-                    style={{ backgroundColor: curso.corHex }}
+                    className="rounded-full p-2.5 shadow-lg backdrop-blur-sm"
+                    style={{ backgroundColor: curso.corHex + (curso.capaAula ? '90' : '') }}
                   >
                     <BookOpen className="w-5 h-5 text-white" />
                   </div>
                 </div>
 
                 {/* Aula número badge */}
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-4 right-4 z-10">
                   <div 
-                    className="px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg"
-                    style={{ backgroundColor: curso.corHex }}
+                    className="px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg backdrop-blur-sm"
+                    style={{ backgroundColor: curso.corHex + (curso.capaAula ? '90' : '') }}
                   >
                     Aula {curso.ordem}
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <div className="mb-1 opacity-80">
-                    <p className="text-xs font-semibold" style={{ color: curso.corHex }}>
+                <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                  <div className="mb-1">
+                    <p 
+                      className="text-xs font-semibold drop-shadow-lg"
+                      style={{ color: curso.capaAula ? '#fff' : curso.corHex }}
+                    >
                       {curso.area}
                     </p>
                   </div>
-                  <h3 className="font-bold text-foreground text-sm leading-tight line-clamp-2 mb-2">
+                  <h3 
+                    className={`font-bold text-sm leading-tight line-clamp-2 mb-2 drop-shadow-lg ${curso.capaAula ? 'text-white' : 'text-foreground'}`}
+                  >
                     {curso.tema}
                   </h3>
                   
                   {/* Arrow on hover */}
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-xs font-medium" style={{ color: curso.corHex }}>
+                    <span 
+                      className="text-xs font-medium drop-shadow-lg"
+                      style={{ color: curso.capaAula ? '#fff' : curso.corHex }}
+                    >
                       Assistir aula
                     </span>
-                    <ArrowRight className="w-3 h-3" style={{ color: curso.corHex }} />
+                    <ArrowRight 
+                      className="w-3 h-3" 
+                      style={{ color: curso.capaAula ? '#fff' : curso.corHex }} 
+                    />
                   </div>
                 </div>
 
@@ -150,7 +176,9 @@ export const CursosCarousel = () => {
                 <div 
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   style={{
-                    background: `linear-gradient(180deg, transparent, ${curso.corHex}20)`
+                    background: curso.capaAula 
+                      ? `linear-gradient(180deg, transparent, ${curso.corHex}40)`
+                      : `linear-gradient(180deg, transparent, ${curso.corHex}20)`
                   }}
                 />
               </div>

@@ -171,9 +171,6 @@ const Index = () => {
           <BibliotecasCarousel />
         </div>
 
-        {/* Cursos em Destaque */}
-        <CursosCarousel />
-
         {/* Academic Environment Section */}
         <div className="space-y-3">
           <h2 className="md:text-lg text-foreground px-1 font-normal text-base">Ambiente Acadêmico</h2>
@@ -330,6 +327,9 @@ const Index = () => {
             </div>
           ) : null}
         </div>
+
+        {/* Cursos em Destaque */}
+        <CursosCarousel />
       </div>
     </div>;
 };
