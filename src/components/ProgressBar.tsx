@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
 
 interface ProgressBarProps {
   progress: number;
@@ -47,11 +46,7 @@ export const ProgressBar = ({ progress, message, subMessage }: ProgressBarProps)
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          {displayProgress < 100 ? (
-            <Loader2 className="w-8 h-8 text-accent animate-spin" />
-          ) : (
-            <span className="text-2xl font-bold text-accent">{displayProgress}%</span>
-          )}
+          <span className="text-2xl font-bold text-accent">{displayProgress}%</span>
         </div>
       </div>
 

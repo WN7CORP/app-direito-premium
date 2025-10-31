@@ -32,7 +32,7 @@ const PlanoEstudos = () => {
       } else {
         clearInterval(interval);
       }
-    }, 1800);
+    }, 1200);
     return interval;
   };
 
@@ -81,15 +81,13 @@ const PlanoEstudos = () => {
         setProgress(100);
         setStatusMessage("✅ Plano pronto!");
 
-        setTimeout(() => {
-          navigate("/plano-estudos/resultado", {
-            state: {
-              plano: result.plano,
-              materia: data.materia || "Plano de Estudos",
-              totalHoras: result.totalHoras,
-            },
-          });
-        }, 500);
+        navigate("/plano-estudos/resultado", {
+          state: {
+            plano: result.plano,
+            materia: data.materia || "Plano de Estudos",
+            totalHoras: result.totalHoras,
+          },
+        });
       }
     } catch (error: any) {
       clearInterval(progressInterval);

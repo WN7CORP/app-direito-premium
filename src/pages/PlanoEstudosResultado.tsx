@@ -7,6 +7,8 @@ import remarkGfm from "remark-gfm";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { parsePlanoEstudos } from "@/lib/planoEstudosParser";
+import { PlanoEstudosAccordion } from "@/components/PlanoEstudosAccordion";
 
 const PlanoEstudosResultado = () => {
   const location = useLocation();
@@ -19,6 +21,8 @@ const PlanoEstudosResultado = () => {
     navigate("/plano-estudos");
     return null;
   }
+
+  const planoParseado = parsePlanoEstudos(plano);
 
   const handleExportPDF = async () => {
     setExportingPDF(true);
@@ -96,16 +100,105 @@ const PlanoEstudosResultado = () => {
           {exportingPDF ? "Gerando PDF..." : "Exportar PDF"}
         </Button>
 
-        {/* Conteúdo do plano */}
-        <Card className="border-accent/20">
-          <CardContent className="p-6">
-            <div className="prose prose-sm max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {plano}
-              </ReactMarkdown>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Objetivo e Visão Geral */}
+        {(planoParseado.objetivo || planoParseado.visaoGeral) && (
+          <Card className="border-accent/20">
+            <CardContent className="p-6 space-y-4">
+              {planoParseado.objetivo && (
+                <div>
+                  <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
+                    <span className="text-accent">🎯</span> Objetivo
+                  </h2>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {planoParseado.objetivo}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+              {planoParseado.visaoGeral && (
+                <div>
+                  <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
+                    <span className="text-accent">📋</span> Visão Geral
+                  </h2>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {planoParseado.visaoGeral}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Cronograma com Accordion */}
+        {planoParseado.semanas.length > 0 && (
+          <Card className="border-accent/20">
+            <CardContent className="p-6">
+              <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <span className="text-accent">📚</span> Cronograma Semanal
+              </h2>
+              <PlanoEstudosAccordion semanas={planoParseado.semanas} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Outras Seções */}
+        {(planoParseado.materiaisEstudo || planoParseado.estrategias || planoParseado.checklist || planoParseado.revisaoFinal) && (
+          <Card className="border-accent/20">
+            <CardContent className="p-6 space-y-6">
+              {planoParseado.materiaisEstudo && (
+                <div>
+                  <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
+                    <span className="text-accent">📚</span> Materiais de Estudo
+                  </h2>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {planoParseado.materiaisEstudo}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+              {planoParseado.estrategias && (
+                <div>
+                  <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
+                    <span className="text-accent">💡</span> Estratégias
+                  </h2>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {planoParseado.estrategias}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+              {planoParseado.checklist && (
+                <div>
+                  <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
+                    <span className="text-accent">✅</span> Checklist
+                  </h2>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {planoParseado.checklist}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+              {planoParseado.revisaoFinal && (
+                <div>
+                  <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
+                    <span className="text-accent">🔄</span> Revisão Final
+                  </h2>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {planoParseado.revisaoFinal}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Botão para novo plano */}
         <Button

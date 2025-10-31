@@ -132,6 +132,37 @@ serve(async (req) => {
           y += 6;
         });
         y += 5;
+      } else if (/^\d+\.\s/.test(line)) {
+        // Lista numerada
+        checkAndAddPage(14);
+        doc.setFontSize(14);
+        doc.setFont("times", "normal");
+        if (darkMode) doc.setTextColor(200, 200, 200);
+        const text = line;
+        const splitText = doc.splitTextToSize(text, maxWidth - 10);
+        
+        splitText.forEach((textLine: string, index: number) => {
+          if (index > 0) checkAndAddPage(9);
+          doc.text(textLine, marginLeft + 10, y);
+          y += 7;
+        });
+        y += 4;
+      } else if (line.includes('- [ ]') || line.includes('- [x]')) {
+        // Checkbox
+        checkAndAddPage(14);
+        doc.setFontSize(14);
+        doc.setFont("times", "normal");
+        if (darkMode) doc.setTextColor(200, 200, 200);
+        const checkbox = line.includes('[x]') ? '☑' : '☐';
+        const text = line.replace(/- \[[ x]\]/, checkbox);
+        const splitText = doc.splitTextToSize(text, maxWidth - 10);
+        
+        splitText.forEach((textLine: string, index: number) => {
+          if (index > 0) checkAndAddPage(9);
+          doc.text(textLine, marginLeft + 10, y);
+          y += 7;
+        });
+        y += 4;
       } else if (line.startsWith('- ') || line.startsWith('* ')) {
         checkAndAddPage(14);
         doc.setFontSize(14);
