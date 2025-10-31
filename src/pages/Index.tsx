@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Crown, Gavel, FileText, Scale, GraduationCap, BookOpen as BookOpenIcon, Library, Hammer, Target, Search, Headphones, Play, Loader2, BookMarked, Newspaper } from "lucide-react";
+import { Crown, Gavel, FileText, Scale, GraduationCap, BookOpen as BookOpenIcon, Library, Hammer, Target, Search, Headphones, Play, Loader2, BookMarked, Newspaper, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import useEmblaCarousel from 'embla-carousel-react';
@@ -167,9 +167,14 @@ const Index = () => {
               <h2 className="md:text-lg text-foreground font-normal text-base">Bibliotecas Elite</h2>
               <span className="px-2.5 py-0.5 md:px-2 md:py-0.5 bg-accent rounded-full text-xs md:text-[10px] font-bold text-accent-foreground">PRO</span>
             </div>
-            <button onClick={() => navigate("/bibliotecas")} className="text-accent font-medium flex items-center text-sm md:text-xs">
-              Todos <span className="text-lg md:text-base ml-0.5">›</span>
-            </button>
+            <Button 
+              size="sm"
+              onClick={() => navigate('/bibliotecas')}
+              className="bg-primary/70 hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-4 flex items-center gap-1.5"
+            >
+              Ver mais
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
           </div>
           
           <BibliotecasCarousel />
@@ -213,9 +218,14 @@ const Index = () => {
                 Descomplicando o Direito
               </p>
             </div>
-            <button onClick={() => navigate("/iniciando-direito")} className="px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium text-sm">
-              Todos
-            </button>
+            <Button 
+              size="sm"
+              onClick={() => navigate('/iniciando-direito')}
+              className="bg-primary/70 hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-4 flex items-center gap-1.5"
+            >
+              Ver mais
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
           </div>
           
           <CursosCarousel />
@@ -227,9 +237,14 @@ const Index = () => {
             <h2 className="md:text-lg text-foreground font-normal text-base">Notícias em Destaque</h2>
             <div className="flex gap-2">
               
-              <button onClick={() => navigate("/noticias-juridicas")} className="text-accent font-medium flex items-center text-sm md:text-xs">
-                Todos <span className="text-lg md:text-base ml-0.5">›</span>
-              </button>
+              <Button 
+                size="sm"
+                onClick={() => navigate('/noticias-juridicas')}
+                className="bg-primary/70 hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-4 flex items-center gap-1.5"
+              >
+                Ver mais
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
             </div>
           </div>
           
