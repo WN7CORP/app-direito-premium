@@ -115,37 +115,108 @@ for (const noticia of selecionadas) {
 
         console.log(`📝 Nova notícia encontrada: ${noticia.titulo}`);
 
-        // Gerar análise com IA
+        // PASSO 1: Fazer scraping do conteúdo completo
+        let conteudoCompleto = '';
+        let scrapingSuccess = false;
+
+        try {
+          console.log(`  → Fazendo scraping de: ${noticia.link}`);
+          const scrapingResponse = await fetch(
+            `${SUPABASE_URL}/functions/v1/buscar-conteudo-noticia`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+              },
+              body: JSON.stringify({ url: noticia.link })
+            }
+          );
+
+          if (scrapingResponse.ok) {
+            const scrapingData = await scrapingResponse.json();
+            if (scrapingData.success && scrapingData.html) {
+              // Limpar HTML e extrair texto
+              conteudoCompleto = scrapingData.html
+                .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+                .replace(/<[^>]+>/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .slice(0, 8000); // Limitar a 8000 caracteres
+              
+              scrapingSuccess = true;
+              console.log(`  ✓ Scraping concluído (${conteudoCompleto.length} caracteres)`);
+            }
+          }
+        } catch (scrapingError) {
+          console.error(`  ✗ Erro no scraping:`, scrapingError);
+        }
+
+        // PASSO 2: Gerar análise COMPLETA com IA
         let analiseIA = null;
         try {
-          const analisePrompt = `Analise esta notícia jurídica de forma clara e objetiva:
+          const analisePrompt = scrapingSuccess 
+            ? `Você é um especialista jurídico que explica notícias de forma clara e acessível.
 
-TÍTULO: ${noticia.titulo}
-FONTE: ${noticia.portal}
+NOTÍCIA: ${noticia.titulo}
+PORTAL: ${noticia.portal}
 CATEGORIA: ${noticia.categoria}
 
-Forneça uma análise estruturada seguindo EXATAMENTE este formato:
+CONTEÚDO COMPLETO DA NOTÍCIA:
+${conteudoCompleto}
+
+Crie uma explicação super descomplicada seguindo esta estrutura:
+
+# 📰 ${noticia.titulo}
+
+## 🎯 O que aconteceu?
+[Explique de forma simples e direta o que aconteceu, como se estivesse contando para um amigo]
+
+## 📋 Pontos Principais
+[Liste os pontos mais importantes em formato de lista]
+
+## ⚖️ Contexto Jurídico
+[Explique o contexto jurídico de forma acessível, conectando com leis e princípios relevantes]
+
+## 🔍 O que isso significa na prática?
+[Traduza o impacto para a vida real - como isso afeta profissionais, estudantes ou cidadãos]
+
+## 💡 Possíveis Impactos
+[Liste os possíveis desdobramentos e consequências]
+
+## 📌 Conclusão
+[Resumo final com os principais takeaways]
+
+Seja técnico mas SUPER acessível. Use exemplos práticos. Evite juridiquês desnecessário.`
+            : `Analise esta notícia jurídica de forma clara e objetiva:
+
+TÍTULO: ${noticia.titulo}
+PORTAL: ${noticia.portal}
+CATEGORIA: ${noticia.categoria}
+
+Crie uma análise estruturada seguindo este formato:
 
 # 📋 Resumo Executivo
-[2-3 linhas explicando o essencial da notícia]
+[2-3 parágrafos com os pontos principais da notícia]
 
 # 🔑 Principais Pontos
-- [Ponto 1]
-- [Ponto 2]
-- [Ponto 3]
+- Ponto 1
+- Ponto 2
+- Ponto 3
 
 # ⚖️ Impacto Jurídico
-[Explique as consequências jurídicas em 2-3 parágrafos]
+[Explicar o impacto desta notícia no cenário jurídico brasileiro]
 
-# 📚 Legislação Relacionada
-[Liste artigos, leis ou códigos relevantes se aplicável]
+# 📌 Para quem interessa
+[Indicar quais profissionais do direito devem prestar atenção]
 
-# 👥 Para Quem Importa
-[Indique quem é afetado: cidadãos, advogados, empresas, etc.]
+# 💡 Observações importantes
+[Pontos de atenção e considerações relevantes]
 
-# 🔍 Contexto Histórico
-[Breve contexto se relevante, ou "Não aplicável"]`;
+Seja técnico mas acessível, use linguagem clara.`;
 
+          console.log(`  → Gerando análise com IA...`);
           const geminiResponse = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${DIREITO_PREMIUM_API_KEY}`,
             {
@@ -157,7 +228,7 @@ Forneça uma análise estruturada seguindo EXATAMENTE este formato:
                 }],
                 generationConfig: {
                   temperature: 0.4,
-                  maxOutputTokens: 2000,
+                  maxOutputTokens: 3000,
                 },
               }),
             }
@@ -166,17 +237,17 @@ Forneça uma análise estruturada seguindo EXATAMENTE este formato:
           if (geminiResponse.ok) {
             const geminiData = await geminiResponse.json();
             analiseIA = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || null;
-            console.log(`✅ Análise gerada com sucesso`);
+            console.log(`  ✓ Análise gerada (${analiseIA?.length || 0} caracteres)`);
           } else {
-            console.error(`❌ Erro ao gerar análise: ${geminiResponse.status}`);
+            console.error(`  ✗ Erro ao gerar análise: ${geminiResponse.status}`);
             analisesFalhas++;
           }
         } catch (analiseError) {
-          console.error('Erro ao gerar análise:', analiseError);
+          console.error('  ✗ Erro ao gerar análise:', analiseError);
           analisesFalhas++;
         }
 
-        // Salvar notícia no banco
+        // PASSO 3: Salvar notícia com análise COMPLETA
         const { error: insertError } = await supabase
           .from('noticias_juridicas_cache')
           .insert({
@@ -187,24 +258,24 @@ Forneça uma análise estruturada seguindo EXATAMENTE este formato:
             fonte: noticia.portal,
             categoria: noticia.categoria,
             data_publicacao: noticia.dataHora,
-            conteudo_completo: '',
+            conteudo_completo: conteudoCompleto || '',
             analise_ia: analiseIA,
             analise_gerada_em: analiseIA ? new Date().toISOString() : null,
           });
 
         if (insertError) {
-          console.error('Erro ao inserir notícia:', insertError);
+          console.error('❌ Erro ao inserir notícia:', insertError);
         } else {
           noticiasAdicionadas++;
           console.log(`✅ Notícia adicionada: ${noticia.titulo}`);
+          console.log(`  - Scraping: ${scrapingSuccess ? 'SIM' : 'NÃO'}`);
+          console.log(`  - Análise: ${analiseIA ? 'SIM' : 'NÃO'}`);
         }
 
-        // Aguardar entre requisições de IA
-        if (analiseIA) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        // Aguardar 3s entre requisições (scraping + IA leva mais tempo)
+        await new Promise(resolve => setTimeout(resolve, 3000));
       } catch (noticiaError) {
-        console.error('Erro ao processar notícia:', noticiaError);
+        console.error('❌ Erro ao processar notícia:', noticiaError);
       }
     }
 

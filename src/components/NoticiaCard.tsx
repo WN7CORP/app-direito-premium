@@ -11,10 +11,11 @@ interface NoticiaCardProps {
   portal: string;
   categoria: string;
   dataHora: string;
+  analise_ia?: string;
   onClick: () => void;
 }
 
-const NoticiaCard = ({ titulo, capa, portal, categoria, dataHora, onClick }: NoticiaCardProps) => {
+const NoticiaCard = ({ titulo, capa, portal, categoria, dataHora, analise_ia, onClick }: NoticiaCardProps) => {
   const formatarDataHora = (data: string) => {
     try {
       if (!data) return 'Sem data';
@@ -83,10 +84,17 @@ const NoticiaCard = ({ titulo, capa, portal, categoria, dataHora, onClick }: Not
         
         {/* Conteúdo - compacto */}
         <div className="p-2.5 space-y-1.5">
-          {/* Categoria */}
-          <Badge className={`${getCategoryColor(categoria)} text-white text-[10px] px-1.5 py-0.5`}>
-            {categoria}
-          </Badge>
+          {/* Categoria e Badge de Análise */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Badge className={`${getCategoryColor(categoria)} text-white text-[10px] px-1.5 py-0.5`}>
+              {categoria}
+            </Badge>
+            {analise_ia && (
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary border-primary/30">
+                ✨ Análise IA
+              </Badge>
+            )}
+          </div>
 
           {/* Título - compacto */}
           <h3 className="font-semibold text-xs text-foreground line-clamp-2 group-hover:text-primary transition-colors leading-snug text-left">

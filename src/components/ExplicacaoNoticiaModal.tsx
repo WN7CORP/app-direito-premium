@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,7 @@ interface ExplicacaoNoticiaModalProps {
   onClose: () => void;
   titulo: string;
   url: string;
+  analisePreGerada?: string;
 }
 
 const ExplicacaoNoticiaModal = ({
@@ -24,9 +25,10 @@ const ExplicacaoNoticiaModal = ({
   onClose,
   titulo,
   url,
+  analisePreGerada,
 }: ExplicacaoNoticiaModalProps) => {
   const [loading, setLoading] = useState(false);
-  const [explicacao, setExplicacao] = useState("");
+  const [explicacao, setExplicacao] = useState(analisePreGerada || "");
   const [exportingPDF, setExportingPDF] = useState(false);
 
   const gerarExplicacao = async () => {
@@ -120,10 +122,20 @@ const ExplicacaoNoticiaModal = ({
   };
 
   const handleClose = () => {
-    setExplicacao("");
+    // Não limpar se for análise pré-gerada
+    if (!analisePreGerada) {
+      setExplicacao("");
+    }
     setLoading(false);
     onClose();
   };
+
+  // Se tiver análise pré-gerada e explicacao estiver vazio, popular
+  useEffect(() => {
+    if (analisePreGerada && !explicacao && isOpen) {
+      setExplicacao(analisePreGerada);
+    }
+  }, [analisePreGerada, isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

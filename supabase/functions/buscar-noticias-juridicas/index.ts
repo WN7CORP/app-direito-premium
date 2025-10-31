@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.74.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,55 +12,45 @@ serve(async (req) => {
   }
 
   try {
-    const GOOGLE_SHEETS_API_KEY = Deno.env.get('GOOGLE_SHEETS_API_KEY');
-    const SHEET_ID = '1tqCcr-HgmY5BMHBkLdSFaW2RoldSdFlM44Qx9xYWMLg';
-    const RANGE = 'NOTICIAS'; // Nome da aba na planilha
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    if (!GOOGLE_SHEETS_API_KEY) {
-      throw new Error('GOOGLE_SHEETS_API_KEY não configurada');
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error('Variáveis de ambiente do Supabase não configuradas');
     }
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${GOOGLE_SHEETS_API_KEY}`;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    console.log('Buscando notícias do cache...');
     
-    console.log('Buscando notícias do Google Sheets...');
-    
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Erro ao buscar planilha:', errorText);
-      throw new Error(`Erro ao buscar planilha: ${response.status} ${response.statusText}`);
+    // Buscar notícias do cache, ordenadas por data mais recente
+    const { data: noticias, error } = await supabase
+      .from('noticias_juridicas_cache')
+      .select('id, titulo, link, imagem, fonte, categoria, data_publicacao, analise_ia')
+      .order('data_publicacao', { ascending: false })
+      .limit(100); // Limitar a 100 notícias mais recentes
+
+    if (error) {
+      console.error('Erro ao buscar notícias:', error);
+      throw error;
     }
 
-    const data = await response.json();
-    
-    if (!data.values || data.values.length < 2) {
-      console.log('Nenhuma notícia encontrada');
-      return new Response(
-        JSON.stringify([]),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Mapear para formato esperado pelo frontend
+    const noticiasFormatadas = (noticias || []).map((noticia) => ({
+      id: noticia.id.toString(),
+      categoria: noticia.categoria || 'Geral',
+      portal: noticia.fonte || 'Portal Jurídico',
+      titulo: noticia.titulo,
+      capa: noticia.imagem || '',
+      link: noticia.link,
+      dataHora: noticia.data_publicacao || new Date().toISOString(),
+      analise_ia: noticia.analise_ia, // ← Incluir análise pré-gerada
+    }));
 
-    // Primeira linha é o cabeçalho: Categoria, Portal, Título, Capa, Link, Data/Hora
-    const rows = data.values.slice(1); // Pular cabeçalho
-    
-    const noticias = rows
-      .filter((row: string[]) => row.length >= 5 && row[2] && row[4]) // Filtrar linhas válidas (mínimo: título e link)
-      .map((row: string[], index: number) => ({
-        id: `noticia-${index}`,
-        categoria: row[0] || 'Geral',
-        portal: row[1] || 'Portal Jurídico',
-        titulo: row[2],
-        capa: row[3] || '',
-        link: row[4],
-        dataHora: row[5] || new Date().toISOString(),
-      }));
-
-    console.log(`${noticias.length} notícias encontradas`);
+    console.log(`${noticiasFormatadas.length} notícias encontradas no cache`);
 
     return new Response(
-      JSON.stringify(noticias),
+      JSON.stringify(noticiasFormatadas),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {

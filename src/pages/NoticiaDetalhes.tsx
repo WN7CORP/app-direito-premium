@@ -13,6 +13,7 @@ interface Noticia {
   capa: string;
   link: string;
   dataHora: string;
+  analise_ia?: string;
 }
 
 const NoticiaDetalhes = () => {
@@ -114,6 +115,7 @@ const NoticiaDetalhes = () => {
         onClose={() => setShowExplicacao(false)}
         titulo={noticia.titulo}
         url={noticia.link}
+        analisePreGerada={noticia.analise_ia}
       />
     </div>
   );

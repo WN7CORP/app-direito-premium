@@ -17,6 +17,7 @@ interface Noticia {
   capa: string;
   link: string;
   dataHora: string;
+  analise_ia?: string;
 }
 const NoticiasJuridicas = () => {
   const navigate = useNavigate();
