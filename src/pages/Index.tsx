@@ -198,6 +198,9 @@ const Index = () => {
           </div>
         </div>
 
+        {/* Cursos em Destaque */}
+        <CursosCarousel />
+
         {/* Notícias em Destaque - Carrossel */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
@@ -327,9 +330,6 @@ const Index = () => {
             </div>
           ) : null}
         </div>
-
-        {/* Cursos em Destaque */}
-        <CursosCarousel />
       </div>
     </div>;
 };
