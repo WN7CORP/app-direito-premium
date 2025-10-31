@@ -77,15 +77,6 @@ const Aprender = () => {
       glowColor: "rgb(37, 99, 235)",
     },
     {
-      id: "cursos",
-      titulo: "Cursos",
-      descricao: "Cursos completos e estruturados de direito",
-      icon: BookOpen,
-      path: "/cursos",
-      iconBg: "bg-blue-600 shadow-lg shadow-blue-500/50",
-      glowColor: "rgb(37, 99, 235)",
-    },
-    {
       id: "dicionario",
       titulo: "Dicionário Jurídico",
       descricao: "Busque definições de termos jurídicos",
