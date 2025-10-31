@@ -157,14 +157,14 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
         throw error;
       }
 
-      if (!data || !data.resposta) {
-        console.error('❌ Resposta inválida:', data);
+      if (!data || !data.data) {
+        console.error('❌ Resposta inválida. Dados completos:', JSON.stringify(data, null, 2));
         throw new Error('Resposta inválida do servidor');
       }
 
       setMessages([
         ...newMessages,
-        { role: "assistant", content: data.resposta },
+        { role: "assistant", content: data.data },
       ]);
       setUploadedFiles([]);
       sonnerToast.success("Resposta recebida!");
