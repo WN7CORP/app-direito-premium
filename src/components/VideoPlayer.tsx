@@ -24,28 +24,37 @@ const VideoPlayer = ({ src, autoPlay = false }: VideoPlayerProps) => {
   const getYouTubeEmbedUrl = (url: string) => {
     try {
       const urlObj = new URL(url);
+      let videoId = '';
       
       // youtube.com/watch?v=ID
       if (urlObj.hostname.includes('youtube.com')) {
-        const videoId = urlObj.searchParams.get('v');
-        if (videoId) {
-          return `https://www.youtube.com/embed/${videoId}?autoplay=${autoPlay ? '1' : '0'}`;
-        }
+        videoId = urlObj.searchParams.get('v') || '';
       }
       
       // youtu.be/ID
       if (urlObj.hostname.includes('youtu.be')) {
-        const videoId = urlObj.pathname.slice(1);
-        if (videoId) {
-          return `https://www.youtube.com/embed/${videoId}?autoplay=${autoPlay ? '1' : '0'}`;
-        }
+        videoId = urlObj.pathname.slice(1);
       }
       
-      // Se já é um embed URL, retornar com autoplay
+      // Se já é um embed URL, extrair ID
       if (url.includes('/embed/')) {
-        return autoPlay && !url.includes('autoplay=') 
-          ? `${url}${url.includes('?') ? '&' : '?'}autoplay=1` 
-          : url;
+        const match = url.match(/embed\/([^?&]+)/);
+        videoId = match ? match[1] : '';
+      }
+      
+      if (videoId) {
+        const params = new URLSearchParams({
+          autoplay: autoPlay ? '1' : '0',
+          modestbranding: '1',        // Minimiza branding do YouTube
+          rel: '0',                    // Vídeos relacionados apenas do mesmo canal
+          iv_load_policy: '3',         // Desabilita anotações
+          playsinline: '1',            // Reprodução inline no iOS
+          enablejsapi: '1',            // Habilita controle via JavaScript
+          origin: window.location.origin, // Segurança
+          vq: 'hd1080',                // Qualidade máxima (HD 1080p)
+        });
+        
+        return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
       }
     } catch (error) {
       console.error('Erro ao processar URL do YouTube:', error);

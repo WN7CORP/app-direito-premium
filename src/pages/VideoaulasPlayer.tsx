@@ -287,7 +287,15 @@ const VideoaulasPlayer = () => {
       {/* Player */}
       <div ref={playerRef} className={`mb-6 transition-all duration-500 ${fromSearch ? 'ring-4 ring-accent/50 rounded-lg' : ''}`}>
         <div className="aspect-video w-full bg-black rounded-lg overflow-hidden shadow-2xl">
-          <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${currentVideo.videoId}?autoplay=1`} title={currentVideo.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
+          <iframe 
+            width="100%" 
+            height="100%" 
+            src={`https://www.youtube.com/embed/${currentVideo.videoId}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1&origin=${window.location.origin}&vq=hd1080`}
+            title={currentVideo.title} 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowFullScreen 
+            className="w-full h-full" 
+          />
         </div>
         <div className="mt-4">
           <h1 className="text-xl md:text-2xl font-bold mb-2">{currentVideo.title}</h1>
