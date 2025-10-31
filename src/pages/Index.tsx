@@ -199,7 +199,26 @@ const Index = () => {
         </div>
 
         {/* Cursos em Destaque */}
-        <CursosCarousel />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <div>
+              <h2 className="md:text-lg text-foreground font-normal text-base">
+                Cursos em Destaque
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Descomplicando o Direito
+              </p>
+            </div>
+            <button 
+              onClick={() => navigate("/iniciando-direito")} 
+              className="text-accent font-medium flex items-center text-sm md:text-xs hover:underline"
+            >
+              Ver todos <span className="text-lg md:text-base ml-0.5">›</span>
+            </button>
+          </div>
+          
+          <CursosCarousel />
+        </div>
 
         {/* Notícias em Destaque - Carrossel */}
         <div className="space-y-3">
