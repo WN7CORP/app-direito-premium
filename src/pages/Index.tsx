@@ -12,7 +12,6 @@ import ProposicoesRecentesCarousel from "@/components/ProposicoesRecentesCarouse
 import { useFeaturedNews } from "@/hooks/useFeaturedNews";
 import { Button } from "@/components/ui/button";
 import { CursosCarousel } from "@/components/CursosCarousel";
-
 const Index = () => {
   const navigate = useNavigate();
   const [atualizandoNoticias, setAtualizandoNoticias] = useState(false);
@@ -26,7 +25,11 @@ const Index = () => {
     containScroll: 'trimSnaps',
     dragFree: true
   });
-  const { featuredNews, loading: loadingNews, reload: reloadNews } = useFeaturedNews();
+  const {
+    featuredNews,
+    loading: loadingNews,
+    reload: reloadNews
+  } = useFeaturedNews();
   const {
     data: videoaulasDestaque
   } = useQuery({
@@ -96,60 +99,61 @@ const Index = () => {
     gradient: "from-[hsl(0,75%,55%)] to-[hsl(350,70%,45%)]",
     route: "/ferramentas"
   }];
-
   const atualizarNoticias = async () => {
     setAtualizandoNoticias(true);
     try {
-      const { data, error } = await supabase.functions.invoke('atualizar-noticias-juridicas');
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('atualizar-noticias-juridicas');
       if (error) throw error;
-      
       const quantidade = data?.noticiasAdicionadas || 0;
       console.log(`${quantidade} notícias atualizadas com sucesso!`);
-      
+
       // Toast detalhado com feedback
       if (quantidade > 0) {
-        const mensagem = quantidade === 1 
-          ? '1 nova notícia adicionada!' 
-          : `${quantidade} novas notícias adicionadas!`;
-        
+        const mensagem = quantidade === 1 ? '1 nova notícia adicionada!' : `${quantidade} novas notícias adicionadas!`;
+
         // Usar toast do sonner
-        const { toast } = await import('sonner');
+        const {
+          toast
+        } = await import('sonner');
         toast.success('Notícias Atualizadas', {
           description: mensagem,
-          duration: 3000,
+          duration: 3000
         });
-        
+
         // Recarregar notícias
         await reloadNews();
       } else {
-        const { toast } = await import('sonner');
+        const {
+          toast
+        } = await import('sonner');
         toast.info('Nenhuma novidade', {
           description: 'Você já está atualizado com as últimas notícias',
-          duration: 3000,
+          duration: 3000
         });
       }
     } catch (error) {
       console.error('Erro ao atualizar notícias:', error);
-      const { toast } = await import('sonner');
+      const {
+        toast
+      } = await import('sonner');
       toast.error('Erro ao atualizar', {
         description: 'Não foi possível atualizar as notícias',
-        duration: 3000,
+        duration: 3000
       });
     } finally {
       setAtualizandoNoticias(false);
     }
   };
-
   return <div className="flex flex-col min-h-screen bg-background pb-20 md:pb-0">
       {/* Header */}
       
 
       <div className="flex-1 px-3 md:px-6 py-4 md:py-6 space-y-5 md:space-y-6">
         {/* Search Bar */}
-        <div
-          onClick={() => navigate('/pesquisar')}
-          className="flex items-center gap-3 px-4 py-3 md:py-2.5 bg-muted rounded-xl cursor-pointer hover:bg-muted/80 transition-colors"
-        >
+        <div onClick={() => navigate('/pesquisar')} className="flex items-center gap-3 px-4 py-3 md:py-2.5 bg-muted rounded-xl cursor-pointer hover:bg-muted/80 transition-colors">
           <Search className="w-5 h-5 md:w-4 md:h-4 text-muted-foreground" />
           <span className="text-foreground/60 text-sm md:text-xs">
             O que você quer buscar?
@@ -209,10 +213,7 @@ const Index = () => {
                 Descomplicando o Direito
               </p>
             </div>
-            <button
-              onClick={() => navigate("/iniciando-direito")}
-              className="px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium text-sm"
-            >
+            <button onClick={() => navigate("/iniciando-direito")} className="px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium text-sm">
               Todos
             </button>
           </div>
@@ -225,129 +226,98 @@ const Index = () => {
           <div className="flex items-center justify-between px-1">
             <h2 className="md:text-lg text-foreground font-normal text-base">Notícias em Destaque</h2>
             <div className="flex gap-2">
-              <Button 
-                onClick={atualizarNoticias} 
-                disabled={atualizandoNoticias}
-                variant="ghost"
-                size="sm"
-                className="text-xs"
-              >
-                {atualizandoNoticias ? <Loader2 className="w-3 h-3 animate-spin" /> : "🔄"}
-              </Button>
+              
               <button onClick={() => navigate("/noticias-juridicas")} className="text-accent font-medium flex items-center text-sm md:text-xs">
                 Todos <span className="text-lg md:text-base ml-0.5">›</span>
               </button>
             </div>
           </div>
           
-          {loadingNews ? (
-            <div className="flex justify-center py-8">
+          {loadingNews ? <div className="flex justify-center py-8">
               <Loader2 className="w-6 h-6 md:w-5 md:h-5 animate-spin text-accent" />
-            </div>
-          ) : featuredNews.length > 0 ? (
-            <div className="overflow-hidden" ref={emblaRefVideo}>
+            </div> : featuredNews.length > 0 ? <div className="overflow-hidden" ref={emblaRefVideo}>
               <div className="flex gap-3 md:gap-4">
                 {featuredNews.map((noticia, index) => {
-                  const formatarDataHora = (dataString: string) => {
-                    try {
-                      if (!dataString) return '';
-                      
-                      // Se for uma data ISO com hora
-                      if (dataString.includes('T')) {
-                        const date = new Date(dataString);
-                        if (isNaN(date.getTime())) return '';
-                        
-                        // Adicionar 3 horas para corrigir fuso horário
-                        date.setHours(date.getHours() + 3);
-                        
-                        return date.toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        });
-                      }
-                      
-                      // Se for uma data com hora no formato brasileiro (dd/MM/yyyy HH:mm)
-                      if (dataString.includes('/') && dataString.includes(':')) {
-                        return dataString;
-                      }
-                      
-                      // Se for apenas data no formato ISO
-                      if (dataString.includes('-')) {
-                        const date = new Date(dataString);
-                        if (isNaN(date.getTime())) return '';
-                        return date.toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric'
-                        });
-                      }
-                      
-                      // Se for apenas data no formato brasileiro dd/MM/yyyy
-                      if (dataString.includes('/')) {
-                        return dataString;
-                      }
-                      
-                      return dataString;
-                    } catch {
-                      return '';
-                    }
-                  };
+              const formatarDataHora = (dataString: string) => {
+                try {
+                  if (!dataString) return '';
 
-                  return (
-                    <div
-                      key={noticia.id}
-                      className="flex-[0_0_70%] md:flex-[0_0_40%] lg:flex-[0_0_28.5%] min-w-0 bg-card rounded-xl overflow-hidden text-left transition-all hover:scale-105 hover:shadow-2xl border border-border hover:border-primary/30 shadow-lg relative"
-                    >
-                      <button
-                        onClick={() => {
-                          navigate('/noticias-juridicas/:noticiaId', {
-                            state: {
-                              noticia: {
-                                id: noticia.id,
-                                categoria: noticia.categoria_tipo || 'Geral',
-                                portal: noticia.fonte || '',
-                                titulo: noticia.titulo,
-                                capa: noticia.imagem || '',
-                                link: noticia.link,
-                                dataHora: noticia.data
-                              }
-                            }
-                          });
-                        }}
-                        className="w-full"
-                      >
-                        {noticia.imagem && (
-                          <div className="aspect-video relative bg-secondary">
-                            <img 
-                              src={noticia.imagem} 
-                              alt={noticia.titulo} 
-                              className="w-full h-full object-cover" 
-                            />
+                  // Se for uma data ISO com hora
+                  if (dataString.includes('T')) {
+                    const date = new Date(dataString);
+                    if (isNaN(date.getTime())) return '';
+
+                    // Adicionar 3 horas para corrigir fuso horário
+                    date.setHours(date.getHours() + 3);
+                    return date.toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    });
+                  }
+
+                  // Se for uma data com hora no formato brasileiro (dd/MM/yyyy HH:mm)
+                  if (dataString.includes('/') && dataString.includes(':')) {
+                    return dataString;
+                  }
+
+                  // Se for apenas data no formato ISO
+                  if (dataString.includes('-')) {
+                    const date = new Date(dataString);
+                    if (isNaN(date.getTime())) return '';
+                    return date.toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    });
+                  }
+
+                  // Se for apenas data no formato brasileiro dd/MM/yyyy
+                  if (dataString.includes('/')) {
+                    return dataString;
+                  }
+                  return dataString;
+                } catch {
+                  return '';
+                }
+              };
+              return <div key={noticia.id} className="flex-[0_0_70%] md:flex-[0_0_40%] lg:flex-[0_0_28.5%] min-w-0 bg-card rounded-xl overflow-hidden text-left transition-all hover:scale-105 hover:shadow-2xl border border-border hover:border-primary/30 shadow-lg relative">
+                      <button onClick={() => {
+                  navigate('/noticias-juridicas/:noticiaId', {
+                    state: {
+                      noticia: {
+                        id: noticia.id,
+                        categoria: noticia.categoria_tipo || 'Geral',
+                        portal: noticia.fonte || '',
+                        titulo: noticia.titulo,
+                        capa: noticia.imagem || '',
+                        link: noticia.link,
+                        dataHora: noticia.data
+                      }
+                    }
+                  });
+                }} className="w-full">
+                        {noticia.imagem && <div className="aspect-video relative bg-secondary">
+                            <img src={noticia.imagem} alt={noticia.titulo} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          </div>
-                        )}
+                          </div>}
                         <div className="p-3">
                           <h3 className="text-sm font-bold text-foreground mb-2 leading-tight text-left">
                             {noticia.titulo}
                           </h3>
                           <div className="flex items-center justify-between text-xs">
-                            {noticia.data && (
-                              <p className="text-muted-foreground">
+                            {noticia.data && <p className="text-muted-foreground">
                                 {formatarDataHora(noticia.data)}
-                              </p>
-                            )}
+                              </p>}
                           </div>
                         </div>
                       </button>
-                    </div>
-                  );
-                })}
+                    </div>;
+            })}
               </div>
-            </div>
-          ) : null}
+            </div> : null}
         </div>
       </div>
     </div>;
