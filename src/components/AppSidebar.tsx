@@ -32,21 +32,17 @@ import {
   FileSearch,
   FileCheck2,
   ClipboardCheck,
-  Star,
   MessageCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AvaliarAppModal } from "./AvaliarAppModal";
 import { SuporteChatModal } from "./SuporteChatModal";
-import { useAppRating } from "@/hooks/useAppRating";
+import { ProfessoraChatDesktop } from "./ProfessoraChatDesktop";
 
 export const AppSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [avaliarModalOpen, setAvaliarModalOpen] = useState(false);
   const [suporteModalOpen, setSuporteModalOpen] = useState(false);
-  
-  const { deviceType, handleRated, handlePostpone } = useAppRating();
+  const [professoraModalOpen, setProfessoraModalOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -118,14 +114,14 @@ export const AppSidebar = () => {
         </div>
       </div>
 
-      {/* Avaliar App - Destaque */}
+      {/* Professora - Destaque vermelho */}
       <div className="px-4 pt-4 pb-2">
         <button
-          onClick={() => setAvaliarModalOpen(true)}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-warning/10 hover:bg-warning/20 transition-all text-left border border-warning/30"
+          onClick={() => setProfessoraModalOpen(true)}
+          className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 transition-all text-left border border-red-500/30"
         >
-          <Star className="w-5 h-5 text-warning animate-pulse" />
-          <span className="text-sm font-medium text-foreground">Avaliar App</span>
+          <GraduationCap className="w-5 h-5 text-red-500 animate-pulse" />
+          <span className="text-sm font-medium text-foreground">Professora</span>
         </button>
       </div>
 
@@ -268,20 +264,11 @@ export const AppSidebar = () => {
         </button>
       </div>
 
-      <AvaliarAppModal 
-        open={avaliarModalOpen} 
-        onOpenChange={setAvaliarModalOpen}
-        deviceType={deviceType}
-        onRated={() => {
-          handleRated();
-          setAvaliarModalOpen(false);
-        }}
-        onPostpone={() => {
-          handlePostpone();
-          setAvaliarModalOpen(false);
-        }}
-      />
       <SuporteChatModal open={suporteModalOpen} onOpenChange={setSuporteModalOpen} />
+      <ProfessoraChatDesktop 
+        isOpen={professoraModalOpen} 
+        onClose={() => setProfessoraModalOpen(false)} 
+      />
     </div>
   );
 };
