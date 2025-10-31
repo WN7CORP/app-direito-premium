@@ -214,9 +214,14 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
-      {/* Header */}
-      <div className="border-b border-border bg-card px-6 py-4 flex-shrink-0">
+    <div className="fixed inset-0 z-40 flex">
+      {/* Overlay escuro */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      
+      {/* Conteúdo centralizado estilo ChatGPT */}
+      <div className="relative z-50 flex flex-col w-full max-w-4xl mx-auto my-8 bg-background rounded-lg shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="border-b border-border bg-card px-6 py-4 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold">Professora Jurídica</h1>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -335,15 +340,15 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
         </ScrollArea>
       </div>
 
-      {/* Footer */}
-      <div className="flex-shrink-0 border-t border-border bg-background">
+      {/* Footer estilo ChatGPT */}
+      <div className="flex-shrink-0 px-6 py-4 bg-background">
         {uploadedFiles.length > 0 && (
-          <div className="px-6 py-2">
+          <div className="mb-3">
             <div className="flex flex-wrap gap-2">
               {uploadedFiles.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 text-sm"
+                  className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2 text-sm"
                 >
                   {file.type.includes("image") ? (
                     <Image className="w-4 h-4" />
@@ -360,67 +365,72 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
           </div>
         )}
 
-        {mode !== "recommendation" && (
-          <div className="px-6 py-3 flex gap-2">
-            <input
-              ref={imageInputRef}
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                e.target.files?.[0] && handleFileSelect(e.target.files[0], "image")
-              }
-              className="hidden"
-            />
-            <button
-              onClick={() => imageInputRef.current?.click()}
-              disabled={isLoading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors border border-border disabled:opacity-50"
-            >
-              <Image className="w-4 h-4" />
-              <span className="text-sm">Analisar Imagem</span>
-            </button>
+        {/* Container estilo ChatGPT */}
+        <div className="bg-muted/30 rounded-2xl border border-border/50 shadow-sm">
+          {mode !== "recommendation" && (
+            <div className="px-4 pt-3 pb-2 flex gap-2 border-b border-border/30">
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  e.target.files?.[0] && handleFileSelect(e.target.files[0], "image")
+                }
+                className="hidden"
+              />
+              <button
+                onClick={() => imageInputRef.current?.click()}
+                disabled={isLoading}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-xs font-medium disabled:opacity-50"
+              >
+                <Image className="w-4 h-4" />
+                <span>Imagem</span>
+              </button>
 
-            <input
-              ref={pdfInputRef}
-              type="file"
-              accept="application/pdf"
-              onChange={(e) =>
-                e.target.files?.[0] && handleFileSelect(e.target.files[0], "pdf")
-              }
-              className="hidden"
-            />
-            <button
-              onClick={() => pdfInputRef.current?.click()}
+              <input
+                ref={pdfInputRef}
+                type="file"
+                accept="application/pdf"
+                onChange={(e) =>
+                  e.target.files?.[0] && handleFileSelect(e.target.files[0], "pdf")
+                }
+                className="hidden"
+              />
+              <button
+                onClick={() => pdfInputRef.current?.click()}
+                disabled={isLoading}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-xs font-medium disabled:opacity-50"
+              >
+                <FileText className="w-4 h-4" />
+                <span>PDF</span>
+              </button>
+            </div>
+          )}
+
+          <div className="px-4 py-3 flex items-center gap-3">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Digite sua pergunta..."
               disabled={isLoading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors border border-border disabled:opacity-50"
+              className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+            <Button
+              onClick={sendMessage}
+              disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
+              size="icon"
+              className="rounded-lg shrink-0"
             >
-              <FileText className="w-4 h-4" />
-              <span className="text-sm">Analisar PDF</span>
-            </button>
+              {isLoading ? (
+                <Brain className="w-5 h-5 animate-pulse" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </Button>
           </div>
-        )}
-
-        <div className="px-6 py-4 flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Digite sua pergunta..."
-            disabled={isLoading}
-            className="flex-1"
-          />
-          <Button
-            onClick={sendMessage}
-            disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
-            size="icon"
-          >
-            {isLoading ? (
-              <Brain className="w-5 h-5 animate-pulse" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </Button>
         </div>
+      </div>
       </div>
     </div>
   );
