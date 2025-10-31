@@ -1,24 +1,52 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpen, GraduationCap } from "lucide-react";
+import { ArrowLeft, BookOpen, GraduationCap, ArrowRight } from "lucide-react";
 import { useCursosCache } from "@/hooks/useCursosCache";
 interface AreaData {
   area: string;
   totalTemas: number;
   primeirosTemas: string[];
   cor: string;
+  corHex: string;
 }
-const CORES_AREAS: Record<string, string> = {
-  "Direito Penal": "bg-red-600",
-  "Direito Civil": "bg-blue-600",
-  "Direito Constitucional": "bg-green-600",
-  "Direito Administrativo": "bg-purple-600",
-  "Direito Trabalhista": "bg-yellow-600",
-  "Direito Empresarial": "bg-pink-600",
-  "Direito Tributário": "bg-indigo-600",
-  "Direito Processual Civil": "bg-cyan-600",
-  "Direito Processual Penal": "bg-orange-600"
+const CORES_AREAS: Record<string, { hex: string; glow: string }> = {
+  "Direito Penal": { 
+    hex: "#ef4444",
+    glow: "0 0 30px rgba(239, 68, 68, 0.5)"
+  },
+  "Direito Civil": { 
+    hex: "#3b82f6",
+    glow: "0 0 30px rgba(59, 130, 246, 0.5)"
+  },
+  "Direito Constitucional": { 
+    hex: "#10b981",
+    glow: "0 0 30px rgba(16, 185, 129, 0.5)"
+  },
+  "Direito Administrativo": { 
+    hex: "#a855f7",
+    glow: "0 0 30px rgba(168, 85, 247, 0.5)"
+  },
+  "Direito Trabalhista": { 
+    hex: "#f59e0b",
+    glow: "0 0 30px rgba(245, 158, 11, 0.5)"
+  },
+  "Direito Empresarial": { 
+    hex: "#ec4899",
+    glow: "0 0 30px rgba(236, 72, 153, 0.5)"
+  },
+  "Direito Tributário": { 
+    hex: "#6366f1",
+    glow: "0 0 30px rgba(99, 102, 241, 0.5)"
+  },
+  "Direito Processual Civil": { 
+    hex: "#06b6d4",
+    glow: "0 0 30px rgba(6, 182, 212, 0.5)"
+  },
+  "Direito Processual Penal": { 
+    hex: "#f97316",
+    glow: "0 0 30px rgba(249, 115, 22, 0.5)"
+  }
 };
 export default function IniciandoDireito() {
   const navigate = useNavigate();
@@ -59,12 +87,16 @@ export default function IniciandoDireito() {
     });
 
     // Converter para array
-    const areasArray: AreaData[] = Array.from(areasMap.entries()).map(([area, dados]) => ({
-      area,
-      totalTemas: dados.total,
-      primeirosTemas: dados.temas.slice(0, 3),
-      cor: CORES_AREAS[area] || 'bg-gray-600'
-    }));
+    const areasArray: AreaData[] = Array.from(areasMap.entries()).map(([area, dados]) => {
+      const corData = CORES_AREAS[area] || { hex: '#6b7280', glow: '0 0 30px rgba(107, 114, 128, 0.5)' };
+      return {
+        area,
+        totalTemas: dados.total,
+        primeirosTemas: dados.temas.slice(0, 3),
+        cor: `bg-[${corData.hex}]`,
+        corHex: corData.hex
+      };
+    });
     
     setAreas(areasArray);
     setLoading(false);
@@ -118,29 +150,50 @@ export default function IniciandoDireito() {
           <h2 className="text-xl font-bold text-foreground mb-4">Áreas do Direito</h2>
           
           <div className="relative space-y-6">
-            {/* Linha vertical */}
-            <div className="absolute left-[9px] top-0 bottom-0 w-0.5 bg-border" />
+            {/* Linha vertical com gradiente */}
+            <div className="absolute left-[11px] top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent" />
 
-            {areas.map((areaData, index) => <div key={areaData.area} className="relative pl-8 animate-fade-in-up" style={{
+            {areas.map((areaData, index) => <div key={areaData.area} className="relative pl-10 animate-fade-in-up" style={{
             animationDelay: `${index * 0.15}s`,
             animationFillMode: 'backwards'
           }}>
-                {/* Marcador colorido com pulso */}
-                <div className={`absolute left-0 top-2 w-5 h-5 rounded-full ${areaData.cor} border-4 border-background shadow-lg animate-glow-pulse`} style={{
-              animationDelay: `${index * 0.15 + 0.3}s`
-            }} />
+                {/* Marcador colorido maior com pulso e glow */}
+                <div 
+                  className="absolute left-0 top-2 w-7 h-7 rounded-full border-4 border-background shadow-lg animate-pulse" 
+                  style={{
+                    backgroundColor: areaData.corHex,
+                    boxShadow: CORES_AREAS[areaData.area]?.glow || '0 0 30px rgba(107, 114, 128, 0.5)',
+                    animationDelay: `${index * 0.15 + 0.3}s`
+                  }} 
+                />
                 
-                {/* Card da área com background gradiente */}
-                <button onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaData.area)}`)} className={`w-full text-left relative overflow-hidden backdrop-blur-sm border-2 border-border/50 rounded-lg p-5 hover:border-primary hover:shadow-2xl shadow-lg transition-all duration-300 group hover:scale-[1.02]`} style={{
-              background: `linear-gradient(135deg, hsl(0 0% 22%) 0%, hsl(0 0% 20%) 80%, ${areaData.cor.replace('bg-', '')} 100%)`,
-              backgroundSize: '200% 200%',
-              backgroundPosition: '0% 0%'
-            }}>
-                  {/* Shimmer effect on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300" style={{
-                background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)`,
-                backgroundSize: '200% 100%'
-              }} />
+                {/* Card da área com background gradiente vibrante */}
+                <div 
+                  onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(areaData.area)}`)} 
+                  className="w-full relative overflow-hidden backdrop-blur-sm border-2 rounded-xl p-6 shadow-xl transition-all duration-500 group hover:scale-[1.03] cursor-pointer"
+                  style={{
+                    background: `linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 70%, ${areaData.corHex}30 100%)`,
+                    borderColor: `${areaData.corHex}40`,
+                    transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = areaData.corHex;
+                    e.currentTarget.style.boxShadow = CORES_AREAS[areaData.area]?.glow || '0 0 30px rgba(107, 114, 128, 0.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = `${areaData.corHex}40`;
+                    e.currentTarget.style.boxShadow = '';
+                  }}
+                >
+                  {/* Shimmer effect mais visível */}
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
+                    style={{
+                      background: `linear-gradient(90deg, transparent, ${areaData.corHex}20, transparent)`,
+                      backgroundSize: '200% 100%',
+                      animation: 'shimmer 2s infinite'
+                    }} 
+                  />
                   
                   <div className="relative z-10">
                     <div className="flex items-start justify-between mb-3">
@@ -152,10 +205,14 @@ export default function IniciandoDireito() {
                           {areaData.totalTemas} {areaData.totalTemas === 1 ? 'tema' : 'temas'} disponíveis
                         </p>
                       </div>
-                      <span className={`${areaData.cor} text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-md animate-bounce-in`} style={{
-                    animationDelay: `${index * 0.15 + 0.5}s`,
-                    animationFillMode: 'backwards'
-                  }}>
+                      <span 
+                        className="text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-md animate-bounce-in" 
+                        style={{
+                          backgroundColor: areaData.corHex,
+                          animationDelay: `${index * 0.15 + 0.5}s`,
+                          animationFillMode: 'backwards'
+                        }}
+                      >
                         {index + 1}
                       </span>
                     </div>
@@ -166,18 +223,48 @@ export default function IniciandoDireito() {
                         Primeiros temas:
                       </p>
                       {areaData.primeirosTemas.map((tema, i) => <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                          <span className="text-primary mt-1">•</span>
+                          <BookOpen className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: areaData.corHex }} />
                           <span className="flex-1">{tema}</span>
                         </div>)}
                     </div>
 
-                    <div className="mt-4 text-right">
-                      <span className="text-xs text-primary font-semibold group-hover:underline inline-flex items-center gap-1">
-                        Ver todos os temas →
-                      </span>
+                    {/* Botão "Ver todos os temas" com animação */}
+                    <div className="mt-5 pt-4 border-t border-border/30">
+                      <button 
+                        className="relative w-full px-5 py-3 rounded-lg font-semibold text-sm transition-all duration-300 overflow-hidden group/btn flex items-center justify-center gap-2"
+                        style={{
+                          backgroundColor: `${areaData.corHex}20`,
+                          color: areaData.corHex,
+                          border: `2px solid ${areaData.corHex}40`
+                        }}
+                        onMouseEnter={(e) => {
+                          e.stopPropagation();
+                          e.currentTarget.style.backgroundColor = `${areaData.corHex}30`;
+                          e.currentTarget.style.borderColor = areaData.corHex;
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = `0 8px 20px ${areaData.corHex}40`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.stopPropagation();
+                          e.currentTarget.style.backgroundColor = `${areaData.corHex}20`;
+                          e.currentTarget.style.borderColor = `${areaData.corHex}40`;
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <span className="relative z-10">Ver todos os {areaData.totalTemas} temas</span>
+                        <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1 relative z-10" />
+                        <div 
+                          className="absolute inset-0 -z-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"
+                          style={{
+                            background: `linear-gradient(90deg, transparent, ${areaData.corHex}20, transparent)`,
+                            animation: 'shimmer 2s infinite'
+                          }}
+                        />
+                      </button>
                     </div>
                   </div>
-                </button>
+                </div>
               </div>)}
           </div>
         </div>

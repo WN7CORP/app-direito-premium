@@ -187,6 +187,15 @@ All colors MUST be HSL.
 }
 
 /* Animações para Simulação de Audiência */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 @keyframes float-up {
   0% {
     opacity: 1;
