@@ -164,7 +164,7 @@ const Index = () => {
               <span className="px-2.5 py-0.5 md:px-2 md:py-0.5 bg-accent rounded-full text-xs md:text-[10px] font-bold text-accent-foreground">PRO</span>
             </div>
             <button onClick={() => navigate("/bibliotecas")} className="text-accent font-medium flex items-center text-sm md:text-xs">
-              Todas <span className="text-lg md:text-base ml-0.5">›</span>
+              Todos <span className="text-lg md:text-base ml-0.5">›</span>
             </button>
           </div>
           
@@ -213,7 +213,7 @@ const Index = () => {
               onClick={() => navigate("/iniciando-direito")}
               className="px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium text-sm"
             >
-              Acessar
+              Todos
             </button>
           </div>
           
@@ -235,7 +235,7 @@ const Index = () => {
                 {atualizandoNoticias ? <Loader2 className="w-3 h-3 animate-spin" /> : "🔄"}
               </Button>
               <button onClick={() => navigate("/noticias-juridicas")} className="text-accent font-medium flex items-center text-sm md:text-xs">
-                Ver todos <span className="text-lg md:text-base ml-0.5">›</span>
+                Todos <span className="text-lg md:text-base ml-0.5">›</span>
               </button>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCursosCache } from "@/hooks/useCursosCache";
-import { BookOpen, ArrowRight } from "lucide-react";
+import { Play, ArrowRight } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SmartLoadingIndicator } from "@/components/chat/SmartLoadingIndicator";
 
@@ -97,13 +97,13 @@ export const CursosCarousel = () => {
                 />
               )}
               
-              {/* Icon - apenas sobre a imagem */}
-              <div className="absolute top-4 left-4 z-10">
+              {/* Icon de Play - centralizado */}
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <div 
-                  className="rounded-full p-2.5 shadow-lg backdrop-blur-sm"
-                  style={{ backgroundColor: curso.corHex + (curso.capaAula ? '90' : '') }}
+                  className="rounded-full p-4 shadow-2xl backdrop-blur-sm"
+                  style={{ backgroundColor: curso.corHex + '40' }}
                 >
-                  <BookOpen className="w-5 h-5 text-white" />
+                  <Play className="w-8 h-8 text-white fill-white" />
                 </div>
               </div>
 
