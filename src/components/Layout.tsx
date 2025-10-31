@@ -19,6 +19,9 @@ export const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const { isMobile, isTablet, isDesktop } = useDeviceType();
   const [professoraModalOpen, setProfessoraModalOpen] = useState(false);
+  
+  // Hook deve ser chamado incondicionalmente no topo do componente
+  const { cursos } = useCursosCache();
 
   // Ouvir eventos de abertura/fechamento do modal da professora
   useEffect(() => {
@@ -72,8 +75,6 @@ export const Layout = ({ children }: LayoutProps) => {
 
   // DESKTOP LAYOUT (>= 1024px)
   if (isDesktop) {
-    const { cursos } = useCursosCache();
-    
     // Detectar se deve mostrar sidebar de playlists
     const isVideoPlayer = location.pathname === '/videoaulas/player';
     const isResumoView = location.pathname.includes('/resumos-juridicos/prontos/') && 
