@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 interface CursoData {
   area: string;
@@ -22,6 +23,28 @@ export const useCursosCache = () => {
 
   useEffect(() => {
     loadCursos();
+
+    // Configurar Realtime para atualização automática
+    const channel: RealtimeChannel = supabase
+      .channel('cursos-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Ouve INSERT, UPDATE e DELETE
+          schema: 'public',
+          table: 'CURSOS-APP'
+        },
+        (payload) => {
+          console.log('📡 Atualização detectada na tabela CURSOS-APP:', payload.eventType);
+          // Recarregar cursos quando houver mudança
+          loadCursos();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadCursos = async () => {
@@ -31,7 +54,6 @@ export const useCursosCache = () => {
       if (cached) {
         const { data, timestamp } = JSON.parse(cached);
         if (Date.now() - timestamp < CACHE_DURATION) {
-          console.log('✅ Cursos carregados do cache');
           setCursos(data);
           setLoading(false);
           return;
@@ -39,7 +61,6 @@ export const useCursosCache = () => {
       }
 
       // 2. Buscar do Supabase
-      console.log('🔄 Buscando cursos do Supabase...');
       const { data, error } = await supabase
         .from('CURSOS-APP' as any)
         .select('*')
@@ -47,18 +68,12 @@ export const useCursosCache = () => {
 
       if (error) throw error;
 
-      console.log('📊 Total de cursos carregados:', data?.length);
-      if (data && data.length > 0) {
-        console.log('📚 Áreas disponíveis:', [...new Set(data.map((c: any) => c.area))]);
-      }
-
       // 3. Salvar no cache
       localStorage.setItem(CACHE_KEY_CURSOS, JSON.stringify({
         data: data || [],
         timestamp: Date.now()
       }));
 
-      console.log('✅ Cursos salvos no cache');
       setCursos(data as any || []);
     } catch (error) {
       console.error('Erro ao carregar cursos:', error);
