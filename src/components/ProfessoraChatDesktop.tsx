@@ -375,9 +375,9 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
                   p: ({ children, node }: any) => {
                     const text = node?.children?.map((child: any) => child.value || '').join('') || '';
                     
-                    // Detectar [DICA DE OURO]
+                    // Detectar [DICA DE OURO] - regex mais flexível
                     if (text.includes('[DICA DE OURO')) {
-                      const match = text.match(/\[DICA DE OURO\s*💎?\]([\s\S]*?)\[\/DICA DE OURO\]/i);
+                      const match = text.match(/\[DICA DE OURO\s*💎?\s*\]([\s\S]*?)\[\/DICA DE OURO\]/i);
                       if (match) {
                         return (
                           <div className="my-4 p-4 bg-yellow-500/10 border-l-4 border-yellow-500 rounded-r-lg">
@@ -395,9 +395,9 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
                       }
                     }
                     
-                    // Detectar [SACOU?]
-                    if (text.includes('[SACOU?')) {
-                      const match = text.match(/\[SACOU\?\s*💡?\]([\s\S]*?)\[\/SACOU\?\]/i);
+                    // Detectar [SACOU?] - regex mais flexível
+                    if (text.includes('[SACOU?') || text.includes('[SACOU\\?')) {
+                      const match = text.match(/\[SACOU\??\s*💡?\s*\]([\s\S]*?)\[\/SACOU\??\]/i);
                       if (match) {
                         return (
                           <div className="my-4 p-4 bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg">
@@ -415,9 +415,9 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
                       }
                     }
                     
-                    // Detectar [FICA LIGADO!]
-                    if (text.includes('[FICA LIGADO!')) {
-                      const match = text.match(/\[FICA LIGADO!\s*⚠️?\]([\s\S]*?)\[\/FICA LIGADO!\]/i);
+                    // Detectar [FICA LIGADO!] - regex mais flexível
+                    if (text.includes('[FICA LIGADO!') || text.includes('[FICA LIGADO\\!')) {
+                      const match = text.match(/\[FICA LIGADO!?\s*⚠️?\s*\]([\s\S]*?)\[\/FICA LIGADO!?\]/i);
                       if (match) {
                         return (
                           <div className="my-4 p-4 bg-orange-500/10 border-l-4 border-orange-500 rounded-r-lg">
