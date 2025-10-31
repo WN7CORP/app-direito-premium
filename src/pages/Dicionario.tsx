@@ -27,76 +27,113 @@ const Dicionario = () => {
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
   const [exemploPratico, setExemploPratico] = useState<{ [palavra: string]: string }>({});
   const [loadingExemplo, setLoadingExemplo] = useState<{ [palavra: string]: boolean }>({});
+  const [resultados, setResultados] = useState<DicionarioTermo[]>([]);
+  const [sugestoes, setSugestoes] = useState<string[]>([]);
+  const [buscaRealizada, setBuscaRealizada] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
 
-  const { data: dicionario, isLoading } = useQuery({
-    queryKey: ["dicionario-all"],
+  // Buscar letras disponíveis apenas
+  const { data: letrasDisponiveis = [] } = useQuery({
+    queryKey: ["dicionario-letras"],
     queryFn: async () => {
-      const pageSize = 1000;
-      let from = 0;
-      let to = pageSize - 1;
-      let all: DicionarioTermo[] = [];
+      const { data, error } = await supabase
+        .from("DICIONARIO" as any)
+        .select("Letra")
+        .not("Letra", "is", null);
 
-      // Busca paginada para superar limites do PostgREST
-      // Garante ordenação consistente em todas as páginas
-      while (true) {
-        const { data, error } = await supabase
-          .from("DICIONARIO" as any)
-          .select("*")
-          .order("Letra", { ascending: true })
-          .order("Palavra", { ascending: true })
-          .range(from, to);
-
-        if (error) throw error;
-        const batch = (data || []) as unknown as DicionarioTermo[];
-        all = all.concat(batch);
-        if (batch.length < pageSize) break;
-        from += pageSize;
-        to += pageSize;
-      }
-
-      console.log(`✅ Dicionário total carregado: ${all.length} termos`);
-      return all;
+      if (error) throw error;
+      const letras = [...new Set((data as any[]).map(d => d.Letra))].sort() as string[];
+      return letras;
     },
     staleTime: 1000 * 60 * 60,
   });
 
-  const filteredTermos = useMemo(() => {
-    if (!dicionario) return [];
-    
-    // Primeiro filtra por letra se uma foi selecionada
-    let filtered = dicionario;
-    if (selectedLetter) {
-      filtered = dicionario.filter(termo => termo.Letra === selectedLetter);
-    }
-    
-    // Depois filtra pela busca se houver
-    if (!searchQuery) return filtered;
+  // Todas as letras do alfabeto
+  const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-    const searchLower = searchQuery.toLowerCase().trim();
+  // Função de busca otimizada
+  const realizarBusca = async (termo?: string) => {
+    const termoBusca = termo || searchQuery.trim();
     
-    // Busca exata primeiro
-    const exactMatch = filtered.filter((termo) => {
-      const palavra = termo.Palavra?.toLowerCase() || "";
-      return palavra === searchLower;
-    });
-    
-    // Se houver match exato, retorna apenas ele
-    if (exactMatch.length > 0) return exactMatch;
-    
-    // Senão, busca parcial
-    return filtered.filter((termo) => {
-      const palavra = termo.Palavra?.toLowerCase() || "";
-      const significado = termo.Significado?.toLowerCase() || "";
-      
-      return palavra.includes(searchLower) || significado.includes(searchLower);
-    });
-  }, [dicionario, searchQuery, selectedLetter]);
+    if (!termoBusca && !selectedLetter) {
+      toast({
+        title: "Digite um termo ou selecione uma letra",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSearching(true);
+    setBuscaRealizada(true);
+    setSugestoes([]);
+
+    try {
+      let query = supabase.from("DICIONARIO" as any).select("*");
+
+      // Se tem letra selecionada, filtra por ela
+      if (selectedLetter) {
+        query = query.eq("Letra", selectedLetter);
+      }
+
+      // Se tem termo de busca, filtra por palavra
+      if (termoBusca) {
+        query = query.ilike("Palavra", `%${termoBusca}%`);
+      }
+
+      const { data, error } = await query
+        .order("Palavra", { ascending: true })
+        .limit(100);
+
+      if (error) throw error;
+
+      const resultadosEncontrados = (data || []) as unknown as DicionarioTermo[];
+      setResultados(resultadosEncontrados);
+
+      // Se não encontrou nada e tem termo de busca, buscar sugestões
+      if (resultadosEncontrados.length === 0 && termoBusca) {
+        await buscarSugestoes(termoBusca);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar:", error);
+      toast({
+        title: "Erro ao buscar termos",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Buscar sugestões para termos similares
+  const buscarSugestoes = async (termo: string) => {
+    try {
+      // Busca fuzzy: pega termos que começam com as primeiras letras
+      const primeiraLetra = termo.charAt(0).toUpperCase();
+      const { data, error } = await supabase
+        .from("DICIONARIO" as any)
+        .select("Palavra")
+        .eq("Letra", primeiraLetra)
+        .limit(5);
+
+      if (error) throw error;
+
+      const palavrasSimilares = (data as any[])
+        .map(d => d.Palavra)
+        .filter(p => p && p.toLowerCase().includes(termo.slice(0, 3).toLowerCase()))
+        .slice(0, 3);
+
+      setSugestoes(palavrasSimilares);
+    } catch (error) {
+      console.error("Erro ao buscar sugestões:", error);
+    }
+  };
 
   // Agrupar por letra
   const termosPorLetra = useMemo(() => {
-    const grouped: { [key: string]: typeof filteredTermos } = {};
-    filteredTermos.forEach((termo) => {
+    const grouped: { [key: string]: DicionarioTermo[] } = {};
+    resultados.forEach((termo) => {
       const letra = termo.Letra || "Outros";
       if (!grouped[letra]) {
         grouped[letra] = [];
@@ -104,16 +141,9 @@ const Dicionario = () => {
       grouped[letra].push(termo);
     });
     return grouped;
-  }, [filteredTermos]);
+  }, [resultados]);
 
   const letras = Object.keys(termosPorLetra).sort();
-  
-  // Todas as letras do alfabeto
-  const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  const letrasDisponiveis = useMemo(() => {
-    if (!dicionario) return [];
-    return [...new Set(dicionario.map(t => t.Letra).filter(Boolean))].sort() as string[];
-  }, [dicionario]);
 
   const handleGerarExemplo = async (palavra: string, significado: string, existente?: string | null) => {
     if (exemploPratico[palavra]) {
@@ -179,7 +209,13 @@ const Dicionario = () => {
               "cursor-pointer transition-all",
               selectedLetter === null && "bg-accent text-accent-foreground"
             )}
-            onClick={() => setSelectedLetter(null)}
+            onClick={() => {
+              setSelectedLetter(null);
+              setSearchQuery("");
+              setResultados([]);
+              setBuscaRealizada(false);
+              setSugestoes([]);
+            }}
           >
             Todas
           </Badge>
@@ -194,7 +230,12 @@ const Dicionario = () => {
                   selectedLetter === letra && "bg-accent text-accent-foreground",
                   !disponivel && "opacity-30 cursor-not-allowed"
                 )}
-                onClick={() => disponivel && setSelectedLetter(letra)}
+                onClick={() => {
+                  if (disponivel) {
+                    setSelectedLetter(letra);
+                    realizarBusca();
+                  }
+                }}
               >
                 {letra}
               </Badge>
@@ -203,29 +244,91 @@ const Dicionario = () => {
         </div>
       </div>
 
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar termo jurídico exato..."
-          className="pl-10 h-11 bg-card border-border"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      {/* Barra de Busca com Botão */}
+      <div className="flex gap-2 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Digite o termo jurídico..."
+            className="pl-10 h-11 bg-card border-border"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                realizarBusca();
+              }
+            }}
+          />
+        </div>
+        <Button 
+          onClick={() => realizarBusca()}
+          disabled={isSearching}
+          className="h-11 px-6"
+        >
+          {isSearching ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Buscando...
+            </>
+          ) : (
+            <>
+              <Search className="w-4 h-4 mr-2" />
+              Pesquisar
+            </>
+          )}
+        </Button>
       </div>
 
-      {isLoading ? (
+      {/* Sugestões "Você quis dizer?" */}
+      {sugestoes.length > 0 && (
+        <Card className="mb-6 border-accent/30 bg-accent/5">
+          <CardContent className="p-4">
+            <p className="text-sm font-semibold mb-2">Você quis dizer:</p>
+            <div className="flex flex-wrap gap-2">
+              {sugestoes.map((sugestao) => (
+                <Badge
+                  key={sugestao}
+                  variant="outline"
+                  className="cursor-pointer hover:bg-accent/20 transition-colors"
+                  onClick={() => {
+                    setSearchQuery(sugestao);
+                    realizarBusca(sugestao);
+                  }}
+                >
+                  {sugestao}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Loading State */}
+      {isSearching ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
-      ) : filteredTermos.length === 0 ? (
+      ) : !buscaRealizada ? (
+        /* Estado Inicial */
+        <div className="text-center py-16">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-3">
+            <Book className="w-7 h-7 text-muted-foreground" />
+          </div>
+          <p className="text-base font-semibold mb-1">Dicionário Jurídico</p>
+          <p className="text-sm text-muted-foreground">
+            Digite um termo e clique em Pesquisar, ou selecione uma letra
+          </p>
+        </div>
+      ) : resultados.length === 0 ? (
+        /* Nenhum Resultado */
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-3">
             <Book className="w-7 h-7 text-muted-foreground" />
           </div>
           <p className="text-sm text-muted-foreground">
-            {searchQuery ? "Nenhum termo encontrado" : "Nenhum termo disponível"}
+            Nenhum termo encontrado
           </p>
         </div>
       ) : (
