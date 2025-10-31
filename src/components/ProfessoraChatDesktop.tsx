@@ -415,24 +415,34 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
                       }
                     }
                     
-                    // Detectar [FICA LIGADO!] - regex mais flexível
-                    if (text.includes('[FICA LIGADO!') || text.includes('[FICA LIGADO\\!')) {
+                    // [FICA LIGADO!]
+                    if (text.match(/\[FICA LIGADO/i)) {
                       const match = text.match(/\[FICA LIGADO!?\s*⚠️?\s*\]([\s\S]*?)\[\/FICA LIGADO!?\]/i);
-                      if (match) {
-                        return (
-                          <div className="my-4 p-4 bg-orange-500/10 border-l-4 border-orange-500 rounded-r-lg">
-                            <div className="flex items-start gap-3">
-                              <span className="text-2xl flex-shrink-0">⚠️</span>
-                              <div>
-                                <strong className="text-orange-400 block mb-2">FICA LIGADO!</strong>
-                                <div className="text-foreground text-[15px] md:text-base leading-relaxed">
-                                  {match[1].trim()}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
+                      if (match) return (<div className="my-4 p-4 bg-orange-500/10 border-l-4 border-orange-500 rounded-r-lg"><div className="flex items-start gap-3"><span className="text-2xl flex-shrink-0">⚠️</span><div><strong className="text-orange-400 block mb-2">FICA LIGADO!</strong><div className="text-foreground text-[15px] md:text-base leading-relaxed">{match[1].trim()}</div></div></div></div>);
+                    }
+                    
+                    // [IMPORTANTE]
+                    if (text.match(/\[IMPORTANTE\]/i)) {
+                      const match = text.match(/\[IMPORTANTE\]([\s\S]*?)\[\/IMPORTANTE\]/i);
+                      if (match) return (<div className="my-4 p-4 bg-red-500/10 border-l-4 border-red-500 rounded-r-lg"><div className="flex items-start gap-3"><span className="text-2xl flex-shrink-0">🚨</span><div><strong className="text-red-400 block mb-2">IMPORTANTE</strong><div className="text-foreground text-[15px] md:text-base leading-relaxed">{match[1].trim()}</div></div></div></div>);
+                    }
+                    
+                    // [ATENÇÃO]
+                    if (text.match(/\[ATEN(Ç|C)ÃO\]/i)) {
+                      const match = text.match(/\[ATEN(Ç|C)ÃO\]([\s\S]*?)\[\/ATEN(Ç|C)ÃO\]/i);
+                      if (match) return (<div className="my-4 p-4 bg-orange-500/10 border-l-4 border-orange-500 rounded-r-lg"><div className="flex items-start gap-3"><span className="text-2xl flex-shrink-0">⚠️</span><div><strong className="text-orange-400 block mb-2">ATENÇÃO</strong><div className="text-foreground text-[15px] md:text-base leading-relaxed">{match[2].trim()}</div></div></div></div>);
+                    }
+                    
+                    // [NOTA]
+                    if (text.match(/\[NOTA\]/i)) {
+                      const match = text.match(/\[NOTA\]([\s\S]*?)\[\/NOTA\]/i);
+                      if (match) return (<div className="my-4 p-4 bg-purple-500/10 border-l-4 border-purple-500 rounded-r-lg"><div className="flex items-start gap-3"><span className="text-2xl flex-shrink-0">📝</span><div><strong className="text-purple-400 block mb-2">NOTA</strong><div className="text-foreground text-[15px] md:text-base leading-relaxed">{match[1].trim()}</div></div></div></div>);
+                    }
+                    
+                    // [DICA]
+                    if (text.match(/^\[DICA\]/i)) {
+                      const match = text.match(/\[DICA\]([\s\S]*?)\[\/DICA\]/i);
+                      if (match) return (<div className="my-4 p-4 bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg"><div className="flex items-start gap-3"><span className="text-2xl flex-shrink-0">💡</span><div><strong className="text-blue-400 block mb-2">DICA</strong><div className="text-foreground text-[15px] md:text-base leading-relaxed">{match[1].trim()}</div></div></div></div>);
                     }
                     
                     // Detectar [ATENÇÃO], [IMPORTANTE], [DICA], [NOTA], [EXEMPLO]
