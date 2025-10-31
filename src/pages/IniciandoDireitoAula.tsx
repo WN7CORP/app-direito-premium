@@ -12,6 +12,7 @@ import { ContentGenerationLoader } from "@/components/ContentGenerationLoader";
 import { FlashcardViewer } from "@/components/FlashcardViewer";
 import { QuizViewer } from "@/components/QuizViewer";
 import { AulaTransitionCard } from "@/components/aula/AulaTransitionCard";
+import { useDeviceType } from "@/hooks/use-device-type";
 interface AulaData {
   tema: string;
   ordem: number;
@@ -56,6 +57,7 @@ export default function IniciandoDireitoAula() {
   const [proximaAulaInfo, setProximaAulaInfo] = useState<{ numero: number; tema: string } | null>(null);
   const conteudoRef = useRef<HTMLDivElement>(null);
   const { cursos, loading: cursosLoading } = useCursosCache();
+  const { isDesktop } = useDeviceType();
   
   const areaDecoded = area ? decodeURIComponent(area) : '';
   const temaDecoded = tema ? decodeURIComponent(tema) : '';
@@ -291,26 +293,28 @@ export default function IniciandoDireitoAula() {
           </div>
         </div>
 
-        {/* Navegação entre aulas - Fixa */}
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40">
-          <div className="max-w-5xl mx-auto px-4 py-3">
-            <div className="flex items-center justify-between gap-4">
-              <Button onClick={navegarAulaAnterior} disabled={!temAnterior} variant="outline" className="flex-1">
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                Aula Anterior
-              </Button>
+        {/* Navegação entre aulas - Fixa (apenas mobile/tablet) */}
+        {!isDesktop && (
+          <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40">
+            <div className="max-w-5xl mx-auto px-4 py-3">
+              <div className="flex items-center justify-between gap-4">
+                <Button onClick={navegarAulaAnterior} disabled={!temAnterior} variant="outline" className="flex-1">
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Aula Anterior
+                </Button>
 
-              <Button 
-                onClick={navegarProximaAula} 
-                disabled={!temProxima} 
-                className="flex-1 bg-primary/70 hover:bg-primary/80"
-              >
-                Próxima Aula
-                <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
+                <Button 
+                  onClick={navegarProximaAula} 
+                  disabled={!temProxima} 
+                  className="flex-1 bg-primary/70 hover:bg-primary/80"
+                >
+                  Próxima Aula
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Botão de voltar ao topo */}
         {showScrollTop && <Button onClick={scrollToTop} size="icon" className="fixed bottom-20 right-6 rounded-full shadow-lg z-50 animate-fade-in" aria-label="Voltar ao topo">

@@ -7,7 +7,9 @@ import { AppSidebar } from "./AppSidebar";
 import { DesktopChatPanel } from "./DesktopChatPanel";
 import { VideoPlaylistSidebar } from "./VideoPlaylistSidebar";
 import { ResumosSidebar } from "./ResumosSidebar";
+import { AulasPlaylistSidebar } from "./AulasPlaylistSidebar";
 import { useDeviceType } from "@/hooks/use-device-type";
+import { useCursosCache } from "@/hooks/useCursosCache";
 
 interface LayoutProps {
   children: ReactNode;
@@ -70,10 +72,19 @@ export const Layout = ({ children }: LayoutProps) => {
 
   // DESKTOP LAYOUT (>= 1024px)
   if (isDesktop) {
+    const { cursos } = useCursosCache();
+    
     // Detectar se deve mostrar sidebar de playlists
     const isVideoPlayer = location.pathname === '/videoaulas/player';
     const isResumoView = location.pathname.includes('/resumos-juridicos/prontos/') && 
                          location.pathname.split('/').length > 4;
+    
+    // Detectar se está na view de aula individual
+    const aulaMatch = location.pathname.match(/^\/iniciando-direito\/([^/]+)\/([^/]+)$/);
+    const isAulaView = !!aulaMatch;
+    const aulaArea = aulaMatch ? decodeURIComponent(aulaMatch[1]) : '';
+    const aulaTema = aulaMatch ? decodeURIComponent(aulaMatch[2]) : '';
+    const aulasDoArea = isAulaView ? cursos.filter(c => c.area === aulaArea) : [];
 
     // Sistema de Layout Variável por Rota
     const getLayoutConfig = () => {
@@ -106,6 +117,15 @@ export const Layout = ({ children }: LayoutProps) => {
         };
       }
       
+      // Aula individual - sidebar de aulas, sem chat
+      if (isAulaView) {
+        return {
+          showLeftSidebar: true,
+          showRightPanel: false,
+          contentMaxWidth: 'max-w-6xl'
+        };
+      }
+      
       // Default: sidebar + chat
       return { 
         showLeftSidebar: true,
@@ -128,6 +148,17 @@ export const Layout = ({ children }: LayoutProps) => {
                 <VideoPlaylistSidebar />
               ) : isResumoView ? (
                 <ResumosSidebar />
+              ) : isAulaView ? (
+                <AulasPlaylistSidebar 
+                  area={aulaArea}
+                  aulas={aulasDoArea.map(c => ({
+                    tema: c.tema,
+                    ordem: c.ordem,
+                    'capa-aula': c['capa-aula'],
+                    'aula-link': c['aula-link']
+                  }))}
+                  aulaAtual={aulaTema}
+                />
               ) : (
                 <AppSidebar />
               )}
