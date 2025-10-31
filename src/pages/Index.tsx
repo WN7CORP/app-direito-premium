@@ -11,6 +11,7 @@ import BibliotecasCarousel from "@/components/BibliotecasCarousel";
 import ProposicoesRecentesCarousel from "@/components/ProposicoesRecentesCarousel";
 import { useFeaturedNews } from "@/hooks/useFeaturedNews";
 import { Button } from "@/components/ui/button";
+import { CursosCarousel } from "@/components/CursosCarousel";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -169,6 +170,9 @@ const Index = () => {
           
           <BibliotecasCarousel />
         </div>
+
+        {/* Cursos em Destaque */}
+        <CursosCarousel />
 
         {/* Academic Environment Section */}
         <div className="space-y-3">

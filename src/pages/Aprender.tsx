@@ -9,6 +9,7 @@ import { VideoPlaylistCarousel } from "@/components/VideoPlaylistCarousel";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { SmartLoadingIndicator } from "@/components/chat/SmartLoadingIndicator";
+import { CursosCarousel } from "@/components/CursosCarousel";
 
 const Aprender = () => {
   const navigate = useNavigate();
@@ -83,6 +84,15 @@ const Aprender = () => {
       path: "/cursos",
       iconBg: "bg-blue-600 shadow-lg shadow-blue-500/50",
       glowColor: "rgb(37, 99, 235)",
+    },
+    {
+      id: "dicionario",
+      titulo: "Dicionário Jurídico",
+      descricao: "Busque definições de termos jurídicos",
+      icon: BookOpen,
+      path: "/dicionario",
+      iconBg: "bg-teal-600 shadow-lg shadow-teal-500/50",
+      glowColor: "rgb(13, 148, 136)",
     },
     {
       id: "plano",
@@ -267,6 +277,18 @@ const Aprender = () => {
               );
             })}
         </div>
+      </div>
+
+      {/* Seção Cursos em Destaque */}
+      <div className="mt-12">
+        <div className="mb-4">
+          <h2 className="text-xl md:text-2xl font-bold mb-2">Cursos em Destaque</h2>
+          <p className="text-sm text-muted-foreground">
+            Descomplicando o Direito
+          </p>
+        </div>
+        
+        <CursosCarousel />
       </div>
 
       {/* Seção Estágios em Direito */}
