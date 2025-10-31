@@ -54,6 +54,19 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
   const imageInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
 
+  // Notificar parent quando modal abre/fecha
+  useEffect(() => {
+    if (isOpen && onClose) {
+      // Disparar evento customizado quando modal abre
+      window.dispatchEvent(new CustomEvent('professora-modal-open'));
+    }
+    return () => {
+      if (isOpen) {
+        window.dispatchEvent(new CustomEvent('professora-modal-close'));
+      }
+    };
+  }, [isOpen]);
+
   // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) {
@@ -121,26 +134,45 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
     setIsLoading(true);
 
     try {
+      console.log('🎓 Enviando mensagem para chat-professora:', {
+        messagesCount: newMessages.length,
+        filesCount: uploadedFiles.length,
+        mode,
+        linguagemMode
+      });
+
       const { data, error } = await supabase.functions.invoke("chat-professora", {
         body: {
-          messages: newMessages,
+          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           files: uploadedFiles,
           mode: mode,
           linguagemMode: linguagemMode,
         },
       });
 
-      if (error) throw error;
+      console.log('✅ Resposta recebida:', { data, error });
+
+      if (error) {
+        console.error('❌ Erro da função:', error);
+        throw error;
+      }
+
+      if (!data || !data.resposta) {
+        console.error('❌ Resposta inválida:', data);
+        throw new Error('Resposta inválida do servidor');
+      }
 
       setMessages([
         ...newMessages,
         { role: "assistant", content: data.resposta },
       ]);
       setUploadedFiles([]);
+      sonnerToast.success("Resposta recebida!");
     } catch (error) {
-      console.error("Erro ao enviar mensagem:", error);
+      console.error("❌ Erro completo ao enviar mensagem:", error);
       sonnerToast.error("Erro ao enviar mensagem. Tente novamente.");
-      setMessages(newMessages);
+      // Remove a última mensagem do usuário em caso de erro
+      setMessages(messages);
     } finally {
       setIsLoading(false);
     }
@@ -214,13 +246,13 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex">
+    <div className="fixed inset-0 z-50 flex">
       {/* Overlay escuro */}
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       
       {/* Conteúdo centralizado estilo ChatGPT */}
-      <div className="relative z-50 flex flex-col w-full max-w-4xl mx-auto my-8 bg-background rounded-lg shadow-2xl overflow-hidden">
-        {/* Header */}
+      <div className="relative z-50 flex flex-col w-full max-w-4xl mx-auto my-8 bg-background rounded-lg shadow-2xl">
+        {/* Header fixo */}
         <div className="border-b border-border bg-card px-6 py-4 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold">Professora Jurídica</h1>
@@ -291,8 +323,8 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-hidden">
+      {/* Messages Area - com altura definida */}
+      <div className="flex-1 overflow-hidden" style={{ maxHeight: 'calc(100vh - 400px)' }}>
         <ScrollArea ref={scrollRef} className="h-full py-4">
           {messages.length === 0 ? (
             renderWelcomeScreen()
@@ -340,8 +372,8 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
         </ScrollArea>
       </div>
 
-      {/* Footer estilo ChatGPT */}
-      <div className="flex-shrink-0 px-6 py-4 bg-background">
+      {/* Footer estilo ChatGPT - sempre visível e fixo */}
+      <div className="flex-shrink-0 px-6 py-4 bg-background border-t border-border">
         {uploadedFiles.length > 0 && (
           <div className="mb-3">
             <div className="flex flex-wrap gap-2">

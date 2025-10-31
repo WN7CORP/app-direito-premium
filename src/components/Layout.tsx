@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import { BottomNav } from "./BottomNav";
@@ -16,6 +16,21 @@ interface LayoutProps {
 export const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const { isMobile, isTablet, isDesktop } = useDeviceType();
+  const [professoraModalOpen, setProfessoraModalOpen] = useState(false);
+
+  // Ouvir eventos de abertura/fechamento do modal da professora
+  useEffect(() => {
+    const handleOpen = () => setProfessoraModalOpen(true);
+    const handleClose = () => setProfessoraModalOpen(false);
+
+    window.addEventListener('professora-modal-open', handleOpen);
+    window.addEventListener('professora-modal-close', handleClose);
+
+    return () => {
+      window.removeEventListener('professora-modal-open', handleOpen);
+      window.removeEventListener('professora-modal-close', handleClose);
+    };
+  }, []);
   
   // Esconder BottomNav em páginas de conteúdo jurídico e simulados
   const hideBottomNav = 
@@ -83,8 +98,8 @@ export const Layout = ({ children }: LayoutProps) => {
             </div>
           </main>
 
-          {/* Chat Panel Direita */}
-          <DesktopChatPanel />
+          {/* Chat Panel Direita - Escondido quando modal Professora aberto */}
+          {!professoraModalOpen && <DesktopChatPanel />}
         </div>
       </div>
     );
