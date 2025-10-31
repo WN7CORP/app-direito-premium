@@ -327,24 +327,13 @@ serve(async (request) => {
         cfContext += `Total de páginas processadas: [X]."\n\n`;
       }
       
-      cfContext += `**📚 2. ANÁLISE JURÍDICA** (BASEADA NO CONTEÚDO REAL):\n`;
-      cfContext += `- Identifique institutos jurídicos PRESENTES no material\n`;
-      cfContext += `- Explique artigos/leis CITADOS no texto\n`;
-      cfContext += `- Relacione com conceitos relevantes\n`;
-      cfContext += `- Tom: ${linguagemMode === 'descomplicado' ? 'descomplicado, sem juridiquês' : 'técnico-jurídico formal'}\n\n`;
       
-      cfContext += `**❓ 3. OFEREÇA OPÇÕES:**\n\n`;
-      cfContext += `"🤔 O que você gostaria agora?\n`;
-      cfContext += `- 📚 Aprofundar em conceitos específicos?\n`;
-      cfContext += `- 📝 Criar resumo estruturado?\n`;
-      cfContext += `- 🎯 Gerar questões de fixação?\n`;
-      cfContext += `- 🃏 Montar flashcards para memorização?"\n\n`;
-      
-      cfContext += `**💬 4. SUGESTÕES CLICÁVEIS** (sobre o conteúdo REAL):\n\n`;
-      cfContext += `[QUESTOES_CLICAVEIS]\n`;
-      cfContext += `["Pergunta sobre algo ESPECÍFICO do material?","Outra pergunta sobre ponto CONCRETO?","Terceira sobre tema PRESENTE?"]\n`;
-      cfContext += `[/QUESTOES_CLICAVEIS]\n\n`;
-      cfContext += `🎯 Suas perguntas DEVEM ser sobre conteúdo que VOCÊ LEU/VIU no arquivo!\n\n`;
+      cfContext += `**📚 2. TEMA PRINCIPAL:**\n`;
+      cfContext += `"**Tema principal:** [Descreva em 1 frase o assunto central do material]\n\n`;
+      cfContext += `**Como posso te ajudar com este material?**\n\n`;
+      cfContext += `[ACAO_BUTTONS]"\n\n`;
+      cfContext += `✅ TOM: SEMPRE sério, objetivo e profissional.\n`;
+      cfContext += `❌ NÃO use tom descomplicado/informal nesta análise inicial.\n\n`;
       
     } else if (hasImageOrPdf && !isAnalyzeMode) {
       const isImage = files[0].type.includes('image');
@@ -366,36 +355,15 @@ serve(async (request) => {
     
     if (isAnalyzeMode) {
       // Modo de análise inicial: SEMPRE sério, objetivo e profissional
-      const isImage = hasImageOrPdf && files[0]?.type.includes('image');
-      
-      systemPrompt = `Você é uma Professora de Direito analisando ${isImage ? 'uma imagem' : 'um documento PDF'}.
+      systemPrompt = `Você é uma Professora de Direito fazendo análise objetiva de material.
 
-**INSTRUÇÕES:**
+REGRA CRÍTICA: Seja SEMPRE séria, objetiva e profissional nesta análise inicial.
+NÃO use tom descomplicado, informal ou didático. Apenas descreva o que você vê/lê.
 
-${isImage ? `1. TRANSCREVA literalmente todo texto visível na imagem
-2. IDENTIFIQUE o tipo de material (caderno, livro, apostila, etc.)
-3. RESUMA em 1-2 parágrafos qual o tema jurídico abordado` : `1. LEIA o texto extraído do PDF
-2. CITE trechos relevantes entre aspas
-3. IDENTIFIQUE artigos de lei, autores e conceitos mencionados
-4. RESUMA em 1-2 parágrafos o tema central do documento`}
-
-**TOM:** Sempre sério, objetivo e profissional (independente do modo configurado).
-
-**ESTRUTURA DA RESPOSTA:**
-
-Identifiquei ${isImage ? 'na imagem' : 'no documento'} o seguinte conteúdo:
-
-[Transcrição/resumo do que foi lido]
-
----
-
-**Tema principal:** [Descrever em 1 frase o assunto]
-
-**Como posso te ajudar com este material?**
-
-[ACAO_BUTTONS]
-Resumir|Explicar detalhadamente|Gerar questões
-[/ACAO_BUTTONS]
+APÓS sua descrição objetiva, inclua:
+- **Tema principal:** [tema em 1 frase]
+- "Como posso te ajudar com este material?"
+- A tag [ACAO_BUTTONS]
 
 ${cfContext}`;
       
