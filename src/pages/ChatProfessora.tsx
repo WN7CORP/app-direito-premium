@@ -337,7 +337,7 @@ const ChatProfessora = () => {
             content: m.content
           })),
           files: filesOverride ?? uploadedFiles,
-          mode: mode,
+          mode: streamMode === 'analyze' ? 'analyze' : mode,
           extractedText: extractedText || undefined,
           deepMode: deepMode,
           responseLevel: responseLevelOverride || (fastMode ? 'basic' : responseLevel),

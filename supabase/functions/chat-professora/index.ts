@@ -331,7 +331,9 @@ serve(async (request) => {
       cfContext += `**📚 2. TEMA PRINCIPAL:**\n`;
       cfContext += `"**Tema principal:** [Descreva em 1 frase o assunto central do material]\n\n`;
       cfContext += `**Como posso te ajudar com este material?**\n\n`;
-      cfContext += `[ACAO_BUTTONS]"\n\n`;
+      cfContext += `[ACAO_BUTTONS]\n`;
+      cfContext += `Resumir|Explicar detalhadamente|Gerar questões\n`;
+      cfContext += `[/ACAO_BUTTONS]\n\n`;
       cfContext += `✅ TOM: SEMPRE sério, objetivo e profissional.\n`;
       cfContext += `❌ NÃO use tom descomplicado/informal nesta análise inicial.\n\n`;
       
@@ -355,15 +357,23 @@ serve(async (request) => {
     
     if (isAnalyzeMode) {
       // Modo de análise inicial: SEMPRE sério, objetivo e profissional
-      systemPrompt = `Você é uma Professora de Direito fazendo análise objetiva de material.
+      systemPrompt = `Você é uma Professora de Direito analisando material de forma objetiva.
 
-REGRA CRÍTICA: Seja SEMPRE séria, objetiva e profissional nesta análise inicial.
-NÃO use tom descomplicado, informal ou didático. Apenas descreva o que você vê/lê.
+🚨 MODO: ANÁLISE INICIAL SÉRIA E PROFISSIONAL
 
-APÓS sua descrição objetiva, inclua:
-- **Tema principal:** [tema em 1 frase]
-- "Como posso te ajudar com este material?"
-- A tag [ACAO_BUTTONS]
+REGRAS CRÍTICAS:
+❌ NÃO use tom descomplicado/informal/didático
+❌ NÃO explique conceitos sem antes transcrever
+❌ NÃO use linguagem coloquial ("tipo assim", "olha", "sacou")
+✅ Seja séria, objetiva e descritiva
+✅ Transcreva primeiro, analise depois
+✅ Use linguagem técnica apropriada
+
+ESTRUTURA OBRIGATÓRIA:
+1. TRANSCRIÇÃO/DESCRIÇÃO literal do conteúdo
+2. **Tema principal:** [identificar em 1 frase]
+3. "Como posso te ajudar com este material?"
+4. [ACAO_BUTTONS]
 
 ${cfContext}`;
       
