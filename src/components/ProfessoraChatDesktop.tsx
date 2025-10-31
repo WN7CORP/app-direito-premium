@@ -14,7 +14,8 @@ import {
   Image,
   FileText,
   Brain,
-  MessageCircle
+  MessageCircle,
+  Paperclip
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast as sonnerToast } from "sonner";
@@ -903,11 +904,11 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
                           )}
                         >
                           {message.role === "assistant" ? (
-                            <div className="text-[14px] leading-[1.5]">
+                            <div className="text-[13px] leading-[1.5]">
                               {parseSpecialContent(message.content)}
                             </div>
                           ) : (
-                            <p className="whitespace-pre-wrap text-[14px] leading-[1.5]">{message.content}</p>
+                            <p className="whitespace-pre-wrap text-[13px] leading-[1.5]">{message.content}</p>
                           )}
                         </div>
                       </div>
@@ -953,47 +954,71 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
 
               {/* Container estilo ChatGPT */}
               <div className="bg-muted/30 rounded-2xl border border-border/50 shadow-sm">
-                {mode !== "recommendation" && (
-                  <div className="px-4 pt-3 pb-2 flex gap-2 border-b border-border/30">
-                    <input
-                      ref={imageInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        e.target.files?.[0] && handleFileSelect(e.target.files[0], "image")
-                      }
-                      className="hidden"
-                    />
-                    <button
-                      onClick={() => imageInputRef.current?.click()}
-                      disabled={isLoading}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-xs font-medium disabled:opacity-50"
-                    >
-                      <Image className="w-4 h-4" />
-                      <span>Imagem</span>
-                    </button>
+                {/* Inputs escondidos */}
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    e.target.files?.[0] && handleFileSelect(e.target.files[0], "image")
+                  }
+                  className="hidden"
+                />
+                <input
+                  ref={pdfInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) =>
+                    e.target.files?.[0] && handleFileSelect(e.target.files[0], "pdf")
+                  }
+                  className="hidden"
+                />
 
-                    <input
-                      ref={pdfInputRef}
-                      type="file"
-                      accept="application/pdf"
-                      onChange={(e) =>
-                        e.target.files?.[0] && handleFileSelect(e.target.files[0], "pdf")
-                      }
-                      className="hidden"
-                    />
-                    <button
-                      onClick={() => pdfInputRef.current?.click()}
+                <div className="px-4 py-3 flex items-center gap-2">
+                  {/* Botão de clipe (paperclip) para anexar arquivos */}
+                  {mode !== "recommendation" && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        // Criar menu de opções
+                        const options = document.createElement('div');
+                        options.className = 'absolute bottom-16 left-4 bg-card border border-border rounded-lg shadow-lg p-2 space-y-1';
+                        options.innerHTML = `
+                          <button class="upload-option flex items-center gap-2 px-3 py-2 rounded hover:bg-muted w-full text-left text-sm" data-type="image">
+                            <span class="w-4 h-4">📷</span>
+                            <span>Imagem</span>
+                          </button>
+                          <button class="upload-option flex items-center gap-2 px-3 py-2 rounded hover:bg-muted w-full text-left text-sm" data-type="pdf">
+                            <span class="w-4 h-4">📄</span>
+                            <span>PDF</span>
+                          </button>
+                        `;
+                        document.body.appendChild(options);
+                        
+                        const closeMenu = () => {
+                          options.remove();
+                          document.removeEventListener('click', closeMenu);
+                        };
+                        
+                        options.querySelectorAll('.upload-option').forEach(btn => {
+                          btn.addEventListener('click', (e) => {
+                            const type = (e.currentTarget as HTMLElement).dataset.type;
+                            if (type === 'image') imageInputRef.current?.click();
+                            if (type === 'pdf') pdfInputRef.current?.click();
+                            closeMenu();
+                          });
+                        });
+                        
+                        setTimeout(() => document.addEventListener('click', closeMenu), 100);
+                      }}
                       disabled={isLoading}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-xs font-medium disabled:opacity-50"
+                      className="shrink-0"
                     >
-                      <FileText className="w-4 h-4" />
-                      <span>PDF</span>
-                    </button>
-                  </div>
-                )}
-
-                <div className="px-4 py-3 flex items-center gap-3">
+                      <Paperclip className="w-5 h-5" />
+                    </Button>
+                  )}
+                  
                   <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -1006,7 +1031,7 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
                     onClick={sendMessage}
                     disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
                     size="icon"
-                    className="rounded-lg shrink-0"
+                    className="rounded-full shrink-0"
                   >
                     {isLoading ? (
                       <Brain className="w-5 h-5 animate-pulse" />
