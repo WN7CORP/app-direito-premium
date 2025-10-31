@@ -456,11 +456,19 @@ const ChatProfessora = () => {
                 // 2. Adicionar quebra dupla antes de títulos se não tiver
                 formattedText = formattedText.replace(/([^\n])\n(#{1,3}\s)/g, '$1\n\n$2');
 
-                // 3. Adicionar quebra dupla entre parágrafos (texto seguido de texto)
-                // IMPORTANTE: Não aplicar se o próximo é uma tag especial ou lista
+                // 3. Adicionar quebra dupla entre parágrafos após pontuação
                 formattedText = formattedText.replace(/([.!?])\n(?!\n)(?![#\-*\d\[])/g, '$1\n\n');
 
-                // 4. Garantir quebra dupla após listas
+                // 4. NOVO: Quebras após qualquer linha seguida de linha começando com maiúscula ou emoji
+                formattedText = formattedText.replace(/([^\n])\n(?!\n)(?=[A-ZÀ-Ú💡🤔📚⚖️✅❌⚠️🎯])/g, '$1\n\n');
+
+                // 5. NOVO: Quebras após linhas longas (>60 chars) para melhorar legibilidade durante streaming
+                formattedText = formattedText.replace(/([^\n]{60,})\n(?!\n)(?![#\-*\d\[])/g, '$1\n\n');
+
+                // 6. Garantir quebra dupla antes de cards especiais
+                formattedText = formattedText.replace(/([^\n])\n(?=\[(DICA|SACOU|IMPORTANTE|ATENÇÃO))/g, '$1\n\n');
+
+                // 7. Garantir quebra dupla após listas
                 formattedText = formattedText.replace(/(\n[-*]\s[^\n]+)\n(?!\n)(?![-*])/g, '$1\n\n');
 
                 // Atualizar UI IMEDIATAMENTE a cada chunk com animação
