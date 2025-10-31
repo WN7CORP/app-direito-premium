@@ -247,8 +247,8 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
 
   return (
     <div className="fixed inset-0 z-50 flex">
-      {/* Overlay escuro */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      {/* Overlay escuro e fosco */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
       
       {/* Conteúdo centralizado estilo ChatGPT */}
       <div className="relative z-50 flex flex-col w-full max-w-4xl mx-auto my-8 bg-background rounded-lg shadow-2xl">
