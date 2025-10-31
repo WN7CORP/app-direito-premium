@@ -151,7 +151,7 @@ const Index = () => {
       {/* Header */}
       
 
-      <div className="flex-1 px-3 md:px-6 py-4 md:py-6 space-y-5 md:space-y-6">
+      <div className="flex-1 px-3 md:px-6 py-4 md:py-6 space-y-8 md:space-y-10">
         {/* Search Bar */}
         <div onClick={() => navigate('/pesquisar')} className="flex items-center gap-3 px-4 py-3 md:py-2.5 bg-muted rounded-xl cursor-pointer hover:bg-muted/80 transition-colors">
           <Search className="w-5 h-5 md:w-4 md:h-4 text-muted-foreground" />
