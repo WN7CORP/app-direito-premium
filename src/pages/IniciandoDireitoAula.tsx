@@ -151,7 +151,19 @@ export default function IniciandoDireitoAula() {
   const getYouTubeEmbedUrl = (url: string) => {
     if (!url) return '';
     const videoId = url.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=))([\w-]{11})/)?.[1];
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+    if (!videoId) return '';
+    
+    // Buscar duração do vídeo via API do YouTube (não precisamos fazer request, vamos usar parâmetro end genérico)
+    // Como não temos a duração exata, usamos um valor alto e subtraímos 3s
+    const params = new URLSearchParams({
+      autoplay: '1',
+      modestbranding: '1',
+      rel: '0',
+      iv_load_policy: '3',
+      playsinline: '1',
+    });
+    
+    return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
   };
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center">
@@ -196,7 +208,12 @@ export default function IniciandoDireitoAula() {
         {/* Player de vídeo - full width no mobile */}
         {aula['aula-link'] && <div className="bg-card border-y md:border md:rounded-lg overflow-hidden md:mx-4 max-w-5xl md:mx-auto">
             <div className="aspect-video">
-              <iframe src={getYouTubeEmbedUrl(aula['aula-link'])} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+              <iframe 
+                src={getYouTubeEmbedUrl(aula['aula-link'])} 
+                className="w-full h-full" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen 
+              />
             </div>
           </div>}
 

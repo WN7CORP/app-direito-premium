@@ -72,6 +72,11 @@ const VideoPlayer = ({ src, autoPlay = false }: VideoPlayerProps) => {
       const progress = (video.currentTime / video.duration) * 100;
       setProgress(progress);
       setCurrentTime(video.currentTime);
+      
+      // Parar 3 segundos antes do fim
+      if (video.duration - video.currentTime <= 3 && !video.paused) {
+        video.pause();
+      }
     };
 
     const updateDuration = () => {
