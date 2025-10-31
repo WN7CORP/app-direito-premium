@@ -26,23 +26,43 @@ serve(async (req) => {
 
     console.log('Chave para Gemini configurada:', API_KEY ? 'Sim (oculta)' : 'Não');
 
-    // Prompt para organizar o conteúdo existente em markdown
-    const promptConteudo = `Você é um professor de Direito. Recebeu o seguinte conteúdo educacional que já está pronto:
+    // Prompt para melhorar e enriquecer o conteúdo existente
+    const promptConteudo = `Você é um professor de Direito experiente e didático. Recebeu o seguinte conteúdo educacional base:
 
 ${conteudo_base}
 
-Sua tarefa é APENAS organizar este conteúdo em markdown limpo e bem formatado, seguindo estas diretrizes:
+Sua tarefa é MELHORAR e ENRIQUECER este conteúdo, deixando-o muito mais explicado e detalhado para que os alunos entendam profundamente cada ponto. Siga estas diretrizes:
 
-1. Mantenha TODO o conteúdo original - não adicione nem remova informações
-2. Organize com títulos e subtítulos usando # ## ###
-3. Use **negrito** para termos importantes
-4. Use listas numeradas e com marcadores onde apropriado
-5. Use tabelas quando houver dados estruturados
-6. Adicione emojis relevantes nos títulos para tornar mais atrativo (📚 🎯 ⚖️ 💡 ✅ etc)
-7. Quebre parágrafos muito longos para melhor leitura
-8. Mantenha todos os exemplos, artigos de lei e explicações originais
+**EXPANSÃO DO CONTEÚDO:**
+1. Pegue cada conceito e explique de forma mais aprofundada e didática
+2. Adicione explicações passo a passo para cada ponto importante
+3. Inclua mais exemplos práticos e situações concretas do dia a dia
+4. Explique o "porquê" de cada regra ou conceito, não apenas o "o quê"
+5. Adicione contexto histórico ou prático quando relevante
+6. Detalhe melhor os artigos de lei mencionados, explicando seu alcance
+7. Inclua casos práticos e como aplicar cada conceito na prática
+8. Adicione dicas de memorização e conexões entre conceitos
 
-Retorne APENAS o conteúdo organizado em markdown limpo, sem introduções ou explicações sobre você.`;
+**FORMATAÇÃO EM MARKDOWN:**
+1. Organize com títulos e subtítulos usando # ## ###
+2. Use **negrito** para termos técnicos e conceitos-chave
+3. Use listas numeradas para processos e passos
+4. Use listas com marcadores para enumerações
+5. Use tabelas para comparações e dados estruturados
+6. Use > para citações de artigos de lei
+7. Use emojis nos títulos para tornar atrativo (📚 🎯 ⚖️ 💡 ✅ ⚠️ 📋 etc)
+8. Quebre em parágrafos curtos para facilitar leitura
+
+**ESTRUTURA SUGERIDA:**
+- Introdução clara do tema
+- Conceitos fundamentais bem explicados
+- Exemplos práticos detalhados
+- Artigos de lei com explicação do seu significado
+- Casos práticos de aplicação
+- Dicas importantes e alertas
+- Resumo dos pontos principais
+
+Retorne APENAS o conteúdo enriquecido em markdown limpo, sem introduções sobre você ou meta-comentários.`;
 
     // Prompt para gerar flashcards com base no conteúdo
     const promptFlashcards = `Com base neste conteúdo sobre "${tema}" da área "${area}":
