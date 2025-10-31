@@ -272,62 +272,80 @@ serve(async (request) => {
     // Instruções FORTES para análise automática de imagem/PDF
     if (isAnalyzeMode && hasImageOrPdf) {
       const isImage = files[0].type.includes('image');
-      const fileType = isImage ? 'imagem' : 'documento PDF';
+      const fileType = isImage ? 'IMAGEM' : 'PDF';
       
-      cfContext += `\n\n🎯 ANÁLISE AUTOMÁTICA DE ${fileType.toUpperCase()}\n`;
-      cfContext += `⚠️⚠️⚠️ VOCÊ ESTÁ RECEBENDO ${isImage ? 'UMA IMAGEM VISUAL' : 'TEXTO EXTRAÍDO DE PDF'} ⚠️⚠️⚠️\n\n`;
+      cfContext += `\n\n🚨 TAREFA CRÍTICA: ANÁLISE DE ${fileType}\n\n`;
       
       if (isImage) {
-        cfContext += `📸 IMAGEM ANEXADA - INSTRUÇÕES CRÍTICAS:\n\n`;
-        cfContext += `1️⃣ OLHE A IMAGEM que está sendo enviada visualmente\n`;
-        cfContext += `2️⃣ DESCREVA LITERALMENTE o que você VÊ:\n`;
-        cfContext += `   ✅ Se é um caderno, livro, apostila, tela, papel\n`;
-        cfContext += `   ✅ Se há texto escrito - TRANSCREVA palavra por palavra\n`;
-        cfContext += `   ✅ Se há questões - COPIE a pergunta completa\n`;
-        cfContext += `   ✅ Se há diagramas - DESCREVA a estrutura visual\n`;
-        cfContext += `   ✅ Se há anotações - TRANSCREVA as anotações\n\n`;
-        cfContext += `⛔ PROIBIDO:\n`;
-        cfContext += `   ❌ NÃO invente texto que não está na imagem\n`;
-        cfContext += `   ❌ NÃO presuma o que "deve estar" sem ver\n`;
-        cfContext += `   ❌ NÃO dê respostas genéricas como "não consigo ver"\n`;
-        cfContext += `   ❌ SE você não conseguir ler, diga: "A imagem está muito borrada/escura, poderia enviar uma foto mais clara?"\n\n`;
+        cfContext += `📸 VOCÊ ESTÁ VENDO UMA IMAGEM VISUAL - INSTRUÇÕES OBRIGATÓRIAS:\n\n`;
+        cfContext += `1. OLHE a imagem que está sendo enviada em formato base64\n`;
+        cfContext += `2. TRANSCREVA literalmente TODO texto visível:\n`;
+        cfContext += `   - Texto manuscrito ou impresso\n`;
+        cfContext += `   - Títulos, subtítulos, numeração\n`;
+        cfContext += `   - Questões completas com alternativas\n`;
+        cfContext += `   - Anotações ou destaques\n\n`;
+        cfContext += `3. DESCREVA o tipo de material:\n`;
+        cfContext += `   - É caderno, livro, apostila, tela de computador?\n`;
+        cfContext += `   - Qual a qualidade: nítido, borrado, parcial?\n`;
+        cfContext += `   - Há elementos visuais (diagramas, tabelas)?\n\n`;
+        cfContext += `⚠️ SE A IMAGEM ESTIVER ILEGÍVEL:\n`;
+        cfContext += `Diga EXATAMENTE: "A imagem está borrada/escura/cortada. Por favor, envie uma foto mais clara com boa iluminação e enquadramento completo."\n\n`;
+        cfContext += `🚫 PROIBIÇÕES ABSOLUTAS:\n`;
+        cfContext += `❌ NÃO invente conteúdo que não está visível\n`;
+        cfContext += `❌ NÃO dê explicações genéricas sem transcrever\n`;
+        cfContext += `❌ NÃO presuma temas sem ler o texto literal\n\n`;
       } else {
-        cfContext += `📄 PDF EXTRAÍDO - INSTRUÇÕES:\n\n`;
-        cfContext += `1️⃣ O texto do PDF foi EXTRAÍDO automaticamente\n`;
-        cfContext += `2️⃣ LEIA o texto fornecido com atenção\n`;
-        cfContext += `3️⃣ CITE trechos LITERAIS do documento\n`;
-        cfContext += `4️⃣ TRANSCREVA as partes principais\n\n`;
+        cfContext += `📄 VOCÊ RECEBEU TEXTO EXTRAÍDO DE PDF (até 50 páginas):\n\n`;
+        cfContext += `1. LEIA o texto extraído com atenção total\n`;
+        cfContext += `2. CITE trechos LITERAIS entre aspas\n`;
+        cfContext += `3. IDENTIFIQUE:\n`;
+        cfContext += `   - Artigos de lei mencionados\n`;
+        cfContext += `   - Conceitos jurídicos presentes\n`;
+        cfContext += `   - Questões ou casos práticos\n`;
+        cfContext += `   - Autores ou doutrinas citadas\n\n`;
+        cfContext += `⚠️ SE O PDF ESTIVER VAZIO/CORROMPIDO:\n`;
+        cfContext += `Diga: "O PDF parece vazio ou não pôde ser lido. Tente um arquivo diferente ou envie como imagem."\n\n`;
       }
       
-      cfContext += `📋 ESTRUTURA OBRIGATÓRIA DA RESPOSTA:\n\n`;
-      cfContext += `**1. DESCRIÇÃO LITERAL** (2-3 parágrafos):\n`;
-      cfContext += `"${isImage ? '📸 Na imagem enviada, vejo [DESCREVER EXATAMENTE]. O texto diz: "[TRANSCREVER TEXTO LITERAL]"' : '📄 O documento enviado contém: [TRANSCREVER CONTEÚDO]'}"\n\n`;
-      cfContext += `**2. ANÁLISE JURÍDICA** (2-3 parágrafos):\n`;
-      cfContext += `Baseado NO CONTEÚDO REAL que você acabou de transcrever:\n`;
-      cfContext += `- Identifique conceitos jurídicos PRESENTES no material\n`;
-      cfContext += `- Explique leis/artigos CITADOS no conteúdo\n`;
-      cfContext += `- Use ${linguagemMode === 'descomplicado' ? 'linguagem DESCOMPLICADA (sem juridiquês)' : 'linguagem TÉCNICA JURÍDICA'}\n\n`;
-      cfContext += `**3. PERGUNTA FINAL:**\n\n`;
-      cfContext += `🤔 O que você quer que eu faça agora?\n`;
-      cfContext += `- 📚 **Aprofundar** em algum ponto específico?\n`;
-      cfContext += `- 📝 **Criar um resumo** completo?\n`;
-      cfContext += `- 🎯 **Gerar questões** de fixação?\n`;
-      cfContext += `- 🃏 **Criar flashcards** para memorização?\n\n`;
-      cfContext += `**4. SUGESTÕES CLICÁVEIS** (baseadas no conteúdo REAL):\n\n`;
+      cfContext += `✅ ESTRUTURA OBRIGATÓRIA DA RESPOSTA:\n\n`;
+      cfContext += `**🔍 1. TRANSCRIÇÃO LITERAL** (PRIMEIRO):\n`;
+      if (isImage) {
+        cfContext += `"📸 Na imagem, vejo [TIPO DE MATERIAL]. O texto diz:\n\n`;
+        cfContext += `'[COPIAR TEXTO EXATAMENTE COMO ESTÁ ESCRITO]'\n\n`;
+        cfContext += `A imagem está [nítida/borrada/parcial]."\n\n`;
+      } else {
+        cfContext += `"📄 O documento contém:\n\n`;
+        cfContext += `'[COPIAR TRECHOS PRINCIPAIS DO TEXTO EXTRAÍDO]'\n\n`;
+        cfContext += `Total de páginas processadas: [X]."\n\n`;
+      }
+      
+      cfContext += `**📚 2. ANÁLISE JURÍDICA** (BASEADA NO CONTEÚDO REAL):\n`;
+      cfContext += `- Identifique institutos jurídicos PRESENTES no material\n`;
+      cfContext += `- Explique artigos/leis CITADOS no texto\n`;
+      cfContext += `- Relacione com conceitos relevantes\n`;
+      cfContext += `- Tom: ${linguagemMode === 'descomplicado' ? 'descomplicado, sem juridiquês' : 'técnico-jurídico formal'}\n\n`;
+      
+      cfContext += `**❓ 3. OFEREÇA OPÇÕES:**\n\n`;
+      cfContext += `"🤔 O que você gostaria agora?\n`;
+      cfContext += `- 📚 Aprofundar em conceitos específicos?\n`;
+      cfContext += `- 📝 Criar resumo estruturado?\n`;
+      cfContext += `- 🎯 Gerar questões de fixação?\n`;
+      cfContext += `- 🃏 Montar flashcards para memorização?"\n\n`;
+      
+      cfContext += `**💬 4. SUGESTÕES CLICÁVEIS** (sobre o conteúdo REAL):\n\n`;
       cfContext += `[QUESTOES_CLICAVEIS]\n`;
-      cfContext += `["Pergunta específica sobre algo que ESTÁ no material?","Outra pergunta sobre conteúdo REAL?","Terceira pergunta relevante?"]\n`;
+      cfContext += `["Pergunta sobre algo ESPECÍFICO do material?","Outra pergunta sobre ponto CONCRETO?","Terceira sobre tema PRESENTE?"]\n`;
       cfContext += `[/QUESTOES_CLICAVEIS]\n\n`;
-      cfContext += `⚠️ LEMBRE-SE: Suas perguntas devem ser sobre o conteúdo REAL da imagem/PDF!\n`;
+      cfContext += `🎯 Suas perguntas DEVEM ser sobre conteúdo que VOCÊ LEU/VIU no arquivo!\n\n`;
+      
     } else if (hasImageOrPdf && !isAnalyzeMode) {
       const isImage = files[0].type.includes('image');
-      const fileType = isImage ? 'imagem' : 'documento PDF';
-      cfContext += `\n\n🔍 ANÁLISE DE ${fileType.toUpperCase()}:\n`;
-      cfContext += `- Você recebeu ${isImage ? 'uma imagem' : 'um documento PDF'} para analisar\n`;
-      cfContext += `- Descreva DETALHADAMENTE o que você vê ${isImage ? 'na imagem' : 'no documento'}\n`;
-      cfContext += `- Identifique conceitos jurídicos, artigos, leis ou qualquer conteúdo relevante\n`;
-      cfContext += `- Use o estilo ${linguagemMode === 'descomplicado' ? 'DESCOMPLICADO (sem juridiquês)' : 'TÉCNICO (com rigor jurídico)'}\n`;
-      cfContext += `- AO FINAL, sugira 3-4 perguntas que o usuário poderia fazer sobre esse conteúdo\n`;
-      cfContext += `- Formato das sugestões:\n\n[QUESTOES_CLICAVEIS]\n{"questions":["Pergunta 1?","Pergunta 2?","Pergunta 3?"]}\n[/QUESTOES_CLICAVEIS]\n\n`;
+      cfContext += `\n\n🔍 ${isImage ? 'IMAGEM' : 'PDF'} ANEXADO:\n`;
+      cfContext += `- TRANSCREVA o conteúdo literal antes de explicar\n`;
+      cfContext += `- CITE trechos específicos entre aspas\n`;
+      cfContext += `- Use linguagem ${linguagemMode === 'descomplicado' ? 'descomplicada' : 'técnica'}\n`;
+      cfContext += `- AO FINAL: sugestões de perguntas sobre o conteúdo\n\n`;
+      cfContext += `[QUESTOES_CLICAVEIS]\n["Pergunta 1?","Pergunta 2?","Pergunta 3?"]\n[/QUESTOES_CLICAVEIS]\n\n`;
     }
 
     // Construir o prompt do sistema
@@ -339,23 +357,32 @@ serve(async (request) => {
     let systemPrompt = '';
     
     if (isAnalyzeMode) {
-      // Modo de análise: FORÇAR VISÃO REAL
-      systemPrompt = `Você é uma professora de Direito com capacidade de VISÃO DE IMAGENS.
+      // Modo de análise: prompt curto e direto focado em TRANSCREVER
+      const isImage = hasImageOrPdf && files[0]?.type.includes('image');
+      
+      systemPrompt = `🎓 Você é uma professora de Direito especializada em análise de materiais.
 
-🔴 CRÍTICO: ${hasImageOrPdf && files[0].type.includes('image') ? 'Você está RECEBENDO UMA IMAGEM VISUALMENTE' : 'Você recebeu texto extraído de PDF'}.
+🔴 TAREFA: ${isImage ? 'LER E TRANSCREVER UMA IMAGEM' : 'LER E TRANSCREVER TEXTO DE PDF'}
 
-${hasImageOrPdf && files[0].type.includes('image') ? `
-📸 A imagem está sendo enviada em formato visual (base64) para você.
-✅ VOCÊ PODE E DEVE ler/ver o conteúdo da imagem
-✅ Transcreva exatamente o que está escrito
-✅ Descreva literalmente o que você vê
-❌ NÃO invente conteúdo que não está lá
-❌ Se não conseguir ler, diga: "A imagem está borrada, poderia enviar mais clara?"
-` : ''}
+${isImage ? `
+📸 IMAGEM VISUAL:
+- Você recebe a imagem em formato base64
+- VOCÊ PODE VER o conteúdo visual
+- TRANSCREVA exatamente o texto que está escrito
+- DESCREVA literalmente o que você vê
+- SE ilegível: "A imagem está borrada/escura. Envie foto mais clara."
+- PROIBIDO inventar conteúdo não visível
+` : `
+📄 TEXTO DE PDF:
+- Texto extraído de até 50 páginas
+- CITE trechos literais entre aspas
+- TRANSCREVA partes principais
+- SE vazio: "O PDF está vazio ou corrompido."
+`}
 
-Use ${linguagemMode === 'descomplicado' ? 'linguagem DESCOMPLICADA (explique como se fosse para um aluno iniciante, sem juridiquês)' : 'linguagem TÉCNICA JURÍDICA (rigor técnico, citações de doutrina, terminologia jurídica precisa)'}.
+🗣️ LINGUAGEM: ${linguagemMode === 'descomplicado' ? 'DESCOMPLICADA (sem juridiquês, como se explicasse para amigo)' : 'TÉCNICA JURÍDICA (termos precisos, rigor formal)'}
 
-Mínimo de 600-800 palavras na análise inicial.
+📏 EXTENSÃO: 600-900 palavras
 
 ${cfContext}`;
       
@@ -897,15 +924,24 @@ ${cfContext || ''}`;
     if (files && files.length > 0) {
       for (const file of files) {
         if (file.type.includes('image')) {
-          console.log('🖼️ Adicionando imagem para análise visual');
+          const base64Data = file.data.split(',')[1];
+          const dataSize = base64Data?.length || 0;
+          console.log(`🖼️ Adicionando imagem: ${file.type}, tamanho base64: ${dataSize} caracteres`);
+          
+          if (dataSize === 0) {
+            console.error('❌ Imagem vazia ou inválida!');
+            continue;
+          }
+          
           imageParts.push({
             inlineData: {
               mimeType: file.type,
-              data: file.data.split(',')[1] // Remove data:image/...;base64, prefix
+              data: base64Data
             }
           });
         }
       }
+      console.log(`✅ Total de imagens processadas: ${imageParts.length}`);
     }
     
     // Primeira mensagem: system prompt + mensagem do usuário (+ imagens se houver)

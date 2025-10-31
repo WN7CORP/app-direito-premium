@@ -207,18 +207,28 @@ const ChatProfessora = () => {
       const pdf = await getDocument({
         data: arrayBuffer
       }).promise;
-      const maxPages = Math.min(pdf.numPages, 15); // limita para performance
+      const maxPages = Math.min(pdf.numPages, 50); // Aumentado para 50 páginas
       let fullText = '';
+      console.log(`📄 Extraindo texto de PDF: ${pdf.numPages} páginas (processando até ${maxPages})`);
+      
       for (let i = 1; i <= maxPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
         const pageText = textContent.items.map((it: any) => 'str' in it ? it.str : '').join(' ');
         fullText += `\n\n[Página ${i}]\n${pageText}`;
       }
+      
+      const charCount = fullText.trim().length;
+      console.log(`✅ PDF extraído: ${maxPages} páginas, ${charCount} caracteres`);
+      
+      if (charCount < 100) {
+        console.warn('⚠️ PDF extraiu poucos caracteres - pode estar vazio ou com imagens');
+      }
+      
       return fullText.trim();
     } catch (e) {
-      console.error('Erro ao extrair texto do PDF', e);
-      return 'Não foi possível extrair o texto deste PDF. Faça uma análise geral do documento pelo contexto e solicite ao usuário pontos de interesse.';
+      console.error('❌ Erro ao extrair texto do PDF:', e);
+      return 'Não foi possível extrair o texto deste PDF. O arquivo pode estar protegido ou corrompido. Por favor, tente outro arquivo.';
     }
   };
 
