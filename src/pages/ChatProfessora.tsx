@@ -1109,6 +1109,9 @@ Seja mais detalhado, traga exemplos práticos, jurisprudências relevantes e an�
                     // Detectar [QUESTOES_CLICAVEIS]
                     const clickableQuestionsRegex = /\[QUESTOES_CLICAVEIS\]([\s\S]*?)\[\/QUESTOES_CLICAVEIS\]/gi;
 
+                    // Detectar [ACAO_BUTTONS] - botões de ação após análise
+                    const actionButtonsRegex = /\[ACAO_BUTTONS\]([\s\S]*?)\[\/ACAO_BUTTONS\]/gi;
+
                     // Detectar [INFOGRÁFICO]
                     const infographicRegex = /\[INFOGRÁFICO:\s*([^\]]+)\]\s*(\{[\s\S]*?\})\s*\[\/INFOGRÁFICO\]/gi;
 
@@ -1178,6 +1181,20 @@ Seja mais detalhado, traga exemplos práticos, jurisprudências relevantes e an�
                           index: m.index,
                           length: m[0].length,
                           type: 'clickable_questions',
+                          match: m as RegExpMatchArray
+                        });
+                      }
+                    }
+
+                    // Coletar botões de ação
+                    const actionButtonMatches = processedContent.matchAll(actionButtonsRegex);
+                    for (const m of actionButtonMatches) {
+                      if (m.index !== undefined) {
+                        console.log('🔘 Botões de ação encontrados na posição:', m.index);
+                        allMatches.push({
+                          index: m.index,
+                          length: m[0].length,
+                          type: 'action_buttons',
                           match: m as RegExpMatchArray
                         });
                       }
@@ -1475,6 +1492,71 @@ Seja mais detalhado, traga exemplos práticos, jurisprudências relevantes e an�
                             console.error('📄 Conteúdo problemático:', match[0].substring(0, 200));
                             // Não renderizar nada em caso de erro (melhor que mostrar tag quebrada)
                           }
+                        } else if (type === 'action_buttons') {
+                          try {
+                            const rawContent = match[1]?.trim();
+                            console.log('🔘 Raw content dos botões:', rawContent);
+                            
+                            // Split por | para obter as 3 ações
+                            const actions = rawContent.split('|').map(a => a.trim());
+                            
+                            if (actions.length === 3) {
+                              console.log(`✅ ${actions.length} botões de ação parseados`);
+                              
+                              // Pegar o conteúdo analisado (texto antes dos botões)
+                              const analyzedContent = processedContent.substring(0, match.index || 0).trim();
+                              
+                              elements.push(
+                                <div key={key++} className="my-6 p-6 bg-card border-2 border-primary/20 rounded-lg">
+                                  <h3 className="text-lg font-bold mb-4 text-center">
+                                    💬 Como posso te ajudar com este material?
+                                  </h3>
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <Button
+                                      variant="outline"
+                                      className="h-auto py-4 px-4 flex flex-col items-center gap-2 hover:bg-primary/10 hover:border-primary transition-all group"
+                                      onClick={() => {
+                                        const actionMessage = `Com base no material que você analisou, faça um resumo executivo destacando os pontos principais.`;
+                                        setInput(actionMessage);
+                                        setTimeout(() => sendMessage(), 100);
+                                      }}
+                                    >
+                                      <FileText className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                                      <span className="font-semibold">{actions[0]}</span>
+                                    </Button>
+                                    
+                                    <Button
+                                      variant="outline"
+                                      className="h-auto py-4 px-4 flex flex-col items-center gap-2 hover:bg-primary/10 hover:border-primary transition-all group"
+                                      onClick={() => {
+                                        const actionMessage = `Com base no material que você analisou, explique detalhadamente os conceitos jurídicos mencionados, usando ${linguagemMode === 'descomplicado' ? 'linguagem simples e acessível' : 'linguagem técnico-jurídica'}.`;
+                                        setInput(actionMessage);
+                                        setTimeout(() => sendMessage(), 100);
+                                      }}
+                                    >
+                                      <Lightbulb className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                                      <span className="font-semibold">{actions[1]}</span>
+                                    </Button>
+                                    
+                                    <Button
+                                      variant="outline"
+                                      className="h-auto py-4 px-4 flex flex-col items-center gap-2 hover:bg-primary/10 hover:border-primary transition-all group"
+                                      onClick={() => {
+                                        handleGenerateQuestions(analyzedContent);
+                                      }}
+                                    >
+                                      <MessageCircle className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                                      <span className="font-semibold">{actions[2]}</span>
+                                    </Button>
+                                  </div>
+                                </div>
+                              );
+                            } else {
+                              console.warn('⚠️ Número incorreto de ações:', actions.length);
+                            }
+                          } catch (e) {
+                            console.error('❌ Erro ao parsear botões de ação:', e);
+                          }
                         } else if (type === 'infographic') {
                           const title = match[1]?.trim();
                           const jsonStr = match[2]?.trim();
@@ -1661,7 +1743,7 @@ Seja mais detalhado, traga exemplos práticos, jurisprudências relevantes e an�
 
                   // Helpers: ocultar blocos incompletos durante streaming e fechar tags ausentes após fim
                   const stripIncompleteBlocks = (content: string) => {
-                    const tags = ['COMPARAÇÃO', 'CARROSSEL', 'ETAPAS', 'TIPOS', 'INFOGRÁFICO', 'ESTATÍSTICAS', 'PROCESSO', 'TABS', 'ACCORDION', 'SLIDES', 'SUGESTÕES', 'ATENÇÃO', 'IMPORTANTE', 'DICA', 'NOTA', 'EXEMPLO', 'QUESTOES_CLICAVEIS', 'CASOS_PRATICOS'];
+                    const tags = ['COMPARAÇÃO', 'CARROSSEL', 'ETAPAS', 'TIPOS', 'INFOGRÁFICO', 'ESTATÍSTICAS', 'PROCESSO', 'TABS', 'ACCORDION', 'SLIDES', 'SUGESTÕES', 'ATENÇÃO', 'IMPORTANTE', 'DICA', 'NOTA', 'EXEMPLO', 'QUESTOES_CLICAVEIS', 'ACAO_BUTTONS', 'CASOS_PRATICOS'];
                     let result = content;
                     for (const t of tags) {
                       // Se abriu e não fechou ainda, tentar renderizar parcialmente
@@ -1729,7 +1811,7 @@ Seja mais detalhado, traga exemplos práticos, jurisprudências relevantes e an�
                   };
 
                   // Remover tags soltas de blocos especiais
-                  let baseContent = message.content.replace(/\[IMPORTANTE\][\s\S]*?\[\/IMPORTANTE\]/gi, '').replace(/\[DICA\][\s\S]*?\[\/DICA\]/gi, '').replace(/\[NOTA\][\s\S]*?\[\/NOTA\]/gi, '').replace(/\[ATENÇÃO\][\s\S]*?\[\/ATENÇÃO\]/gi, '').replace(/\[EXEMPLO\][\s\S]*?\[\/EXEMPLO\]/gi, '').replace(/\[CASOS_PRATICOS\][\s\S]*?\[\/CASOS_PRATICOS\]/gi, '').replace(/\[QUESTOES_CLICAVEIS\][\s\S]*?\[\/QUESTOES_CLICAVEIS\]/gi, '').replace(/\[COMPARAÇÃO\][\s\S]*?\[\/COMPARAÇÃO\]/gi, '').replace(/\[SUGESTÕES\][\s\S]*?\[\/SUGESTÕES\]/gi, '').replace(/\[SUGESTÕES\]/gi, '').replace(/\[\/SUGESTÕES\]/gi, '').replace(/\[INFOGRÁFICO\][\s\S]*?\[\/INFOGRÁFICO\]/gi, '').replace(/\[INFOGRÁFICO\]/gi, '').replace(/\[\/INFOGRÁFICO\]/gi, '').replace(/\(Aguarde a geração do infográfico\)/gi, '').replace(/\[COMPARAÇÃO\]/gi, '').replace(/\[\/COMPARAÇÃO\]/gi, '').replace(/\[ESTATÍSTICAS\]/gi, '').replace(/\[\/ESTATÍSTICAS\]/gi, '').replace(/\[MERMAID\]/gi, '').replace(/\[\/MERMAID\]/gi, '').replace(/\[PROCESSO\]/gi, '').replace(/\[\/PROCESSO\]/gi, '');
+                  let baseContent = message.content.replace(/\[IMPORTANTE\][\s\S]*?\[\/IMPORTANTE\]/gi, '').replace(/\[DICA\][\s\S]*?\[\/DICA\]/gi, '').replace(/\[NOTA\][\s\S]*?\[\/NOTA\]/gi, '').replace(/\[ATENÇÃO\][\s\S]*?\[\/ATENÇÃO\]/gi, '').replace(/\[EXEMPLO\][\s\S]*?\[\/EXEMPLO\]/gi, '').replace(/\[CASOS_PRATICOS\][\s\S]*?\[\/CASOS_PRATICOS\]/gi, '').replace(/\[QUESTOES_CLICAVEIS\][\s\S]*?\[\/QUESTOES_CLICAVEIS\]/gi, '').replace(/\[ACAO_BUTTONS\][\s\S]*?\[\/ACAO_BUTTONS\]/gi, '').replace(/\[COMPARAÇÃO\][\s\S]*?\[\/COMPARAÇÃO\]/gi, '').replace(/\[SUGESTÕES\][\s\S]*?\[\/SUGESTÕES\]/gi, '').replace(/\[SUGESTÕES\]/gi, '').replace(/\[\/SUGESTÕES\]/gi, '').replace(/\[INFOGRÁFICO\][\s\S]*?\[\/INFOGRÁFICO\]/gi, '').replace(/\[INFOGRÁFICO\]/gi, '').replace(/\[\/INFOGRÁFICO\]/gi, '').replace(/\(Aguarde a geração do infográfico\)/gi, '').replace(/\[COMPARAÇÃO\]/gi, '').replace(/\[\/COMPARAÇÃO\]/gi, '').replace(/\[ESTATÍSTICAS\]/gi, '').replace(/\[\/ESTATÍSTICAS\]/gi, '').replace(/\[MERMAID\]/gi, '').replace(/\[\/MERMAID\]/gi, '').replace(/\[PROCESSO\]/gi, '').replace(/\[\/PROCESSO\]/gi, '');
                   const safeContent = message.isStreaming ? stripIncompleteBlocks(baseContent) : autoCloseBlocks(baseContent);
                   const parsedContent = !message.isStreaming ? parseSpecialContent(safeContent) : null;
                   return <>

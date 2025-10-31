@@ -196,7 +196,15 @@ serve(async (request) => {
     console.log('📎 Arquivos anexados:', files?.length || 0);
     console.log('🔍 Modo:', mode);
     
-    const isAnalyzeMode = mode === 'analyze';
+    // Detectar se é ação pós-análise (usuário clicou em "Resumir", "Explicar", etc.)
+    const lastUserMessage = messages[messages.length - 1]?.content || '';
+    const isPostAnalysisAction = lastUserMessage.includes('Com base no material que você analisou');
+    
+    // Se é ação pós-análise, não usar modo de análise inicial
+    const isAnalyzeMode = mode === 'analyze' && !isPostAnalysisAction;
+    
+    console.log('🔄 Ação pós-análise?', isPostAnalysisAction);
+    console.log('📋 Modo de análise inicial?', isAnalyzeMode);
     
     const DIREITO_PREMIUM_API_KEY = Deno.env.get('DIREITO_PREMIUM_API_KEY') || 
                                      Deno.env.get('DIREITO_PREMIUM_API_KEY_RESERVA');
@@ -357,86 +365,37 @@ serve(async (request) => {
     let systemPrompt = '';
     
     if (isAnalyzeMode) {
-      // Modo de análise: prompt IMPERATIVO focado em TRANSCRIÇÃO LITERAL
+      // Modo de análise inicial: SEMPRE sério, objetivo e profissional
       const isImage = hasImageOrPdf && files[0]?.type.includes('image');
       
-      systemPrompt = `Você é uma Professora de Direito analisando ${isImage ? 'UMA IMAGEM' : 'UM PDF'}.
+      systemPrompt = `Você é uma Professora de Direito analisando ${isImage ? 'uma imagem' : 'um documento PDF'}.
 
-🔴 INSTRUÇÕES CRÍTICAS - SIGA RIGOROSAMENTE:
+**INSTRUÇÕES:**
 
-${isImage ? `📸 VOCÊ ESTÁ VENDO UMA IMAGEM (formato base64):
+${isImage ? `1. TRANSCREVA literalmente todo texto visível na imagem
+2. IDENTIFIQUE o tipo de material (caderno, livro, apostila, etc.)
+3. RESUMA em 1-2 parágrafos qual o tema jurídico abordado` : `1. LEIA o texto extraído do PDF
+2. CITE trechos relevantes entre aspas
+3. IDENTIFIQUE artigos de lei, autores e conceitos mencionados
+4. RESUMA em 1-2 parágrafos o tema central do documento`}
 
-1️⃣ PRIMEIRO: Transcreva LITERALMENTE todo texto visível
-   - Copie exatamente como está escrito
-   - Inclua números de artigos, incisos, parágrafos
-   - Use aspas para indicar texto transcrito
+**TOM:** Sempre sério, objetivo e profissional (independente do modo configurado).
 
-2️⃣ SEGUNDO: Descreva o tipo de material
-   - É caderno manuscrito? Livro impresso? Documento jurídico?
-   - Cor da tinta, tipo de letra, qualidade da imagem
+**ESTRUTURA DA RESPOSTA:**
 
-3️⃣ TERCEIRO: Explique o conteúdo jurídico mencionado
-   - Qual o tema tratado no texto transcrito?
-   - Que conceitos aparecem?
+Identifiquei ${isImage ? 'na imagem' : 'no documento'} o seguinte conteúdo:
 
-⚠️ SE A IMAGEM ESTIVER BORRADA/ILEGÍVEL:
-Diga EXATAMENTE: "A imagem está ilegível devido a [motivo: pouca luz/foto tremida/resolução baixa]. Por favor, envie uma foto mais clara com boa iluminação e câmera estável."
+[Transcrição/resumo do que foi lido]
 
-❌ PROIBIDO:
-- Inventar conteúdo que não está visível
-- Dar explicações genéricas sem transcrever
-- Presumir o que está escrito sem ler
-` : `📄 VOCÊ RECEBEU TEXTO EXTRAÍDO DE PDF (até 50 páginas):
+---
 
-1️⃣ PRIMEIRO: Cite trechos literais entre aspas
-   - "Art. X da Lei Y..."
-   - "Segundo o autor Z..."
-   - Copie exatamente como aparece no texto
+**Tema principal:** [Descrever em 1 frase o assunto]
 
-2️⃣ SEGUNDO: Identifique elementos jurídicos
-   - Artigos de lei mencionados
-   - Autores citados (doutrina)
-   - Casos jurisprudenciais
-   - Conceitos-chave
+**Como posso te ajudar com este material?**
 
-3️⃣ TERCEIRO: Explique o conteúdo encontrado
-   - Qual o tema principal do PDF?
-   - Que teses são defendidas?
-   - Contexto jurídico
-
-⚠️ SE O PDF ESTIVER VAZIO/CORROMPIDO:
-Diga EXATAMENTE: "O PDF está vazio ou corrompido. Nenhum texto foi extraído. Tente enviar outro arquivo."
-
-❌ PROIBIDO:
-- Presumir conteúdo sem ler o texto extraído
-- Dar respostas genéricas
-- Inventar citações que não estão no texto
-`}
-
-🗣️ TOM DE VOZ: ${linguagemMode === 'descomplicado' ? 'Fale como se explicasse para um amigo que não é da área jurídica. Zero juridiquês, use exemplos simples.' : 'Use linguagem técnico-jurídica formal, termos precisos, rigor conceitual.'}
-
-📏 TAMANHO OBRIGATÓRIO: 600-900 palavras
-
-✅ ESTRUTURA DA RESPOSTA:
-
-# 🔍 O QUE EU ${isImage ? 'VI' : 'LI'}:
-
-[Transcrição literal do conteúdo]
-
-# 📚 ANÁLISE JURÍDICA:
-
-[Explicação baseada SOMENTE no conteúdo real transcrito acima]
-
-# ❓ PRÓXIMOS PASSOS:
-
-Escolha uma opção:
-- **Aprofundar:** Quer que eu explique algum conceito mencionado?
-- **Resumir:** Quer um resumo executivo deste material?
-- **Gerar Questões:** Quer questões de fixação sobre este conteúdo?
-
-[QUESTOES_CLICAVEIS]
-["Primeira pergunta sobre conteúdo ESPECÍFICO?","Segunda pergunta sobre conceito MENCIONADO?","Terceira pergunta sobre tema REAL do material?"]
-[/QUESTOES_CLICAVEIS]
+[ACAO_BUTTONS]
+Resumir|Explicar detalhadamente|Gerar questões
+[/ACAO_BUTTONS]
 
 ${cfContext}`;
       
