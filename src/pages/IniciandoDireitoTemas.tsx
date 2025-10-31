@@ -31,32 +31,27 @@ export default function IniciandoDireitoTemas() {
   }>();
   const [temas, setTemas] = useState<TemaData[]>([]);
   const [loading, setLoading] = useState(true);
-  const { cursos, loading: cursosLoading } = useCursosCache();
-  
+  const {
+    cursos,
+    loading: cursosLoading
+  } = useCursosCache();
   const areaDecoded = area ? decodeURIComponent(area) : '';
   const corArea = CORES_AREAS[areaDecoded] || 'bg-gray-600';
-
   useEffect(() => {
     if (!cursosLoading && areaDecoded) {
-      const temasArea = cursos
-        .filter(c => c.area === areaDecoded)
-        .map(c => ({
-          tema: c.tema,
-          ordem: c.ordem,
-          'capa-aula': c['capa-aula'],
-          'aula-link': c['aula-link']
-        }))
-        .sort((a, b) => a.ordem - b.ordem);
-      
+      const temasArea = cursos.filter(c => c.area === areaDecoded).map(c => ({
+        tema: c.tema,
+        ordem: c.ordem,
+        'capa-aula': c['capa-aula'],
+        'aula-link': c['aula-link']
+      })).sort((a, b) => a.ordem - b.ordem);
       setTemas(temasArea);
       setLoading(false);
     }
   }, [cursosLoading, cursos, areaDecoded]);
 
   // Preload das primeiras 3 capas
-  const capasUrls = temas
-    .filter(t => t['capa-aula'])
-    .map(t => t['capa-aula']);
+  const capasUrls = temas.filter(t => t['capa-aula']).map(t => t['capa-aula']);
   useImagePreload(capasUrls);
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background pb-20">
@@ -78,9 +73,7 @@ export default function IniciandoDireitoTemas() {
           <div className="relative space-y-6">
             <div className="absolute left-[9px] top-0 bottom-0 w-0.5 bg-border" />
             
-            {[...Array(5)].map((_, i) => (
-              <TemaCardSkeleton key={i} index={i} corArea={corArea} />
-            ))}
+            {[...Array(5)].map((_, i) => <TemaCardSkeleton key={i} index={i} corArea={corArea} />)}
           </div>
         </div>
       </div>;
@@ -90,10 +83,7 @@ export default function IniciandoDireitoTemas() {
       <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-[600px] lg:max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/iniciando-direito')} className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Button>
+            
           </div>
           
           <div className="flex items-center gap-3">
@@ -139,17 +129,9 @@ export default function IniciandoDireitoTemas() {
                 
                 {/* Imagem de capa */}
                 {temaData['capa-aula'] && <div className="relative h-40 overflow-hidden bg-muted">
-                    <img 
-                      src={temaData['capa-aula']} 
-                      alt={temaData.tema} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      loading={index < 3 ? "eager" : "lazy"}
-                      decoding="async"
-                      fetchPriority={index === 0 ? "high" : "auto"}
-                      onError={e => {
-                        e.currentTarget.style.display = 'none';
-                      }} 
-                    />
+                    <img src={temaData['capa-aula']} alt={temaData.tema} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading={index < 3 ? "eager" : "lazy"} decoding="async" fetchPriority={index === 0 ? "high" : "auto"} onError={e => {
+                e.currentTarget.style.display = 'none';
+              }} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                     <div className="absolute top-3 right-3 animate-bounce-in" style={{
                 animationDelay: `${index * 0.12 + 0.5}s`,
