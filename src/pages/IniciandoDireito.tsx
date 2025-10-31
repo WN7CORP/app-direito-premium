@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, GraduationCap } from "lucide-react";
-import { toast } from "sonner";
+import { useCursosCache } from "@/hooks/useCursosCache";
 interface AreaData {
   area: string;
   totalTemas: number;
@@ -25,53 +24,50 @@ export default function IniciandoDireito() {
   const navigate = useNavigate();
   const [areas, setAreas] = useState<AreaData[]>([]);
   const [loading, setLoading] = useState(true);
+  const { cursos, loading: cursosLoading } = useCursosCache();
+
   useEffect(() => {
-    carregarAreas();
-  }, []);
-  const carregarAreas = async () => {
-    try {
-      const {
-        data,
-        error
-      } = await supabase.from('CURSOS-APP' as any).select('area, tema, ordem').order('area').order('ordem');
-      if (error) throw error;
-      if (!data) {
-        setAreas([]);
-        return;
-      }
-
-      // Agrupar por área
-      const areasMap = new Map<string, {
-        temas: string[];
-        total: number;
-      }>();
-      data.forEach((row: any) => {
-        const area = row.area;
-        if (!areasMap.has(area)) {
-          areasMap.set(area, {
-            temas: [],
-            total: 0
-          });
-        }
-        const areaData = areasMap.get(area)!;
-        areaData.temas.push(row.tema);
-        areaData.total++;
-      });
-
-      // Converter para array
-      const areasArray: AreaData[] = Array.from(areasMap.entries()).map(([area, dados]) => ({
-        area,
-        totalTemas: dados.total,
-        primeirosTemas: dados.temas.slice(0, 3),
-        cor: CORES_AREAS[area] || 'bg-gray-600'
-      }));
-      setAreas(areasArray);
-    } catch (error) {
-      console.error('Erro ao carregar áreas:', error);
-      toast.error('Erro ao carregar áreas do Direito');
-    } finally {
-      setLoading(false);
+    if (!cursosLoading) {
+      processarAreas();
     }
+  }, [cursosLoading, cursos]);
+
+  const processarAreas = () => {
+    if (cursos.length === 0) {
+      setAreas([]);
+      setLoading(false);
+      return;
+    }
+
+    // Agrupar por área
+    const areasMap = new Map<string, {
+      temas: string[];
+      total: number;
+    }>();
+    
+    cursos.forEach((curso: any) => {
+      const area = curso.area;
+      if (!areasMap.has(area)) {
+        areasMap.set(area, {
+          temas: [],
+          total: 0
+        });
+      }
+      const areaData = areasMap.get(area)!;
+      areaData.temas.push(curso.tema);
+      areaData.total++;
+    });
+
+    // Converter para array
+    const areasArray: AreaData[] = Array.from(areasMap.entries()).map(([area, dados]) => ({
+      area,
+      totalTemas: dados.total,
+      primeirosTemas: dados.temas.slice(0, 3),
+      cor: CORES_AREAS[area] || 'bg-gray-600'
+    }));
+    
+    setAreas(areasArray);
+    setLoading(false);
   };
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center">

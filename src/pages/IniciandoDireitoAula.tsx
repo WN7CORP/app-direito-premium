@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, ChevronLeft, ChevronRight, Sparkles, BookOpen, Brain, ClipboardCheck, ArrowUp } from "lucide-react";
 import { toast } from "sonner";
+import { useCursosCache } from "@/hooks/useCursosCache";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ContentGenerationLoader } from "@/components/ContentGenerationLoader";
@@ -54,14 +55,28 @@ export default function IniciandoDireitoAula() {
   const [mostrarTransicao, setMostrarTransicao] = useState(false);
   const [proximaAulaInfo, setProximaAulaInfo] = useState<{ numero: number; tema: string } | null>(null);
   const conteudoRef = useRef<HTMLDivElement>(null);
+  const { cursos, loading: cursosLoading } = useCursosCache();
+  
   const areaDecoded = area ? decodeURIComponent(area) : '';
   const temaDecoded = tema ? decodeURIComponent(tema) : '';
+  
   useEffect(() => {
-    if (areaDecoded && temaDecoded) {
-      carregarAula();
-      carregarTodasAulas();
+    if (!cursosLoading && areaDecoded && temaDecoded) {
+      const aulaEncontrada = cursos.find(
+        c => c.area === areaDecoded && c.tema === temaDecoded
+      );
+      if (aulaEncontrada) {
+        setAula(aulaEncontrada as any);
+      }
+      setLoading(false);
+      
+      // Carregar lista de todas as aulas
+      const temasArea = cursos
+        .filter(c => c.area === areaDecoded)
+        .map(c => ({ tema: c.tema, ordem: c.ordem }));
+      setTodasAulas(temasArea);
     }
-  }, [areaDecoded, temaDecoded]);
+  }, [cursosLoading, cursos, areaDecoded, temaDecoded]);
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -70,33 +85,6 @@ export default function IniciandoDireitoAula() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  const carregarAula = async () => {
-    try {
-      const {
-        data,
-        error
-      } = await supabase.from('CURSOS-APP' as any).select('*').eq('area', areaDecoded).eq('tema', temaDecoded).single();
-      if (error) throw error;
-      setAula(data as any);
-    } catch (error) {
-      console.error('Erro ao carregar aula:', error);
-      toast.error('Erro ao carregar aula');
-    } finally {
-      setLoading(false);
-    }
-  };
-  const carregarTodasAulas = async () => {
-    try {
-      const {
-        data,
-        error
-      } = await supabase.from('CURSOS-APP' as any).select('tema, ordem').eq('area', areaDecoded).order('ordem');
-      if (error) throw error;
-      setTodasAulas(data as any || []);
-    } catch (error) {
-      console.error('Erro ao carregar lista de aulas:', error);
-    }
-  };
   const gerarConteudo = async () => {
     if (!aula) return;
     setGerando(true);
