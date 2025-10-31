@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { 
   Loader2, 
   Send, 
@@ -13,7 +13,8 @@ import {
   Scale,
   Image,
   FileText,
-  Brain
+  Brain,
+  MessageCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast as sonnerToast } from "sonner";
@@ -22,6 +23,16 @@ import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { HighlightedBox } from "@/components/chat/HighlightedBox";
+import { ComparisonCarousel } from "@/components/chat/ComparisonCarousel";
+import { PracticalCasesCarousel } from "@/components/chat/PracticalCasesCarousel";
+import { InfographicTimeline } from "@/components/chat/InfographicTimeline";
+import { StatisticsCard } from "@/components/chat/StatisticsCard";
+import { LegalStatistics } from "@/components/chat/LegalStatistics";
+import { ProcessFlow } from "@/components/chat/ProcessFlow";
+import { MarkdownTabs } from "@/components/chat/MarkdownTabs";
+import { MarkdownAccordion } from "@/components/chat/MarkdownAccordion";
+import { MarkdownSlides } from "@/components/chat/MarkdownSlides";
 
 interface Message {
   role: "user" | "assistant";
@@ -193,6 +204,529 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
     "O que são direitos fundamentais?",
   ];
 
+  // Função para parsear conteúdo especial (copiado do mobile)
+  const parseSpecialContent = (content: string) => {
+    let processedContent = content.replace(/\\n\\n\\n\\n/g, '\n\n\n\n')
+      .replace(/\\n\\n/g, '\n\n')
+      .replace(/\\n/g, '\n');
+
+    const elements: JSX.Element[] = [];
+    let key = 0;
+
+    const comparisonRegex = /\[(COMPARAÇÃO|CARROSSEL|ETAPAS|TIPOS):\s*([^\]]+)\]\s*(\{[\s\S]*?\})\s*\[\/(COMPARAÇÃO|CARROSSEL|ETAPAS|TIPOS)\]/gi;
+    const practicalCasesRegex = /\[CASOS_PRATICOS\]\s*(\{[\s\S]*?\})\s*\[\/CASOS_PRATICOS\]/gi;
+    const clickableQuestionsRegex = /\[QUESTOES_CLICAVEIS\]([\s\S]*?)\[\/QUESTOES_CLICAVEIS\]/gi;
+    const infographicRegex = /\[INFOGRÁFICO:\s*([^\]]+)\]\s*(\{[\s\S]*?\})\s*\[\/INFOGRÁFICO\]/gi;
+    const statsRegex = /\[ESTATÍSTICAS(?::\s*([^\]]+))?\]\s*(\{[\s\S]*?\})\s*\[\/ESTATÍSTICAS\]/gi;
+    const processRegex = /\[PROCESSO:\s*([^\]]+)\]\s*(\{[\s\S]*?\})\s*\[\/PROCESSO\]/gi;
+    const tabsRegex = /\[TABS:\s*([^\]]+)\]\s*(\{[\s\S]*?\})\s*\[\/TABS\]/gi;
+    const accordionRegex = /\[ACCORDION\]\s*(\{[\s\S]*?\})\s*\[\/ACCORDION\]/gi;
+    const slidesRegex = /\[SLIDES:\s*([^\]]+)\]\s*(\{[\s\S]*?\})\s*\[\/SLIDES\]/gi;
+
+    const allMatches: Array<{
+      index: number;
+      length: number;
+      type: string;
+      match: RegExpMatchArray;
+    }> = [];
+
+    // Coletar todas as correspondências
+    const compMatches = processedContent.matchAll(comparisonRegex);
+    for (const m of compMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'comparison',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    const practicalMatches = processedContent.matchAll(practicalCasesRegex);
+    for (const m of practicalMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'practical_cases',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    const questionMatches = processedContent.matchAll(clickableQuestionsRegex);
+    for (const m of questionMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'clickable_questions',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    const infoMatches = processedContent.matchAll(infographicRegex);
+    for (const m of infoMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'infographic',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    const statMatches = processedContent.matchAll(statsRegex);
+    for (const m of statMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'stats',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    const processMatches = processedContent.matchAll(processRegex);
+    for (const m of processMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'process',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    const tabMatches = processedContent.matchAll(tabsRegex);
+    for (const m of tabMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'tabs',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    const accordionMatches = processedContent.matchAll(accordionRegex);
+    for (const m of accordionMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'accordion',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    const slideMatches = processedContent.matchAll(slidesRegex);
+    for (const m of slideMatches) {
+      if (m.index !== undefined) {
+        allMatches.push({
+          index: m.index,
+          length: m[0].length,
+          type: 'slides',
+          match: m as RegExpMatchArray
+        });
+      }
+    }
+
+    // Ordenar por índice
+    allMatches.sort((a, b) => a.index - b.index);
+
+    let lastIndex = 0;
+    allMatches.forEach(({ index: startIdx, length, type, match }) => {
+      const endIdx = startIdx + length;
+
+      // Adicionar texto antes do elemento especial
+      if (startIdx > lastIndex) {
+        let textBefore = processedContent.substring(lastIndex, startIdx);
+        
+        if (textBefore.trim()) {
+          elements.push(
+            <div key={key++} className="prose prose-sm max-w-none dark:prose-invert">
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]} 
+                components={{
+                  h1: ({ children }) => (
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-6 mt-8 leading-tight">
+                      {children}
+                    </h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4 mt-6 leading-tight">
+                      {children}
+                    </h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3 mt-5 leading-snug">
+                      {children}
+                    </h3>
+                  ),
+                  p: ({ children, node }: any) => {
+                    const text = node?.children?.map((child: any) => child.value || '').join('') || '';
+                    
+                    // Detectar [DICA DE OURO]
+                    if (text.includes('[DICA DE OURO')) {
+                      const match = text.match(/\[DICA DE OURO\s*💎?\]([\s\S]*?)\[\/DICA DE OURO\]/i);
+                      if (match) {
+                        return (
+                          <div className="my-4 p-4 bg-yellow-500/10 border-l-4 border-yellow-500 rounded-r-lg">
+                            <div className="flex items-start gap-3">
+                              <span className="text-2xl flex-shrink-0">💎</span>
+                              <div>
+                                <strong className="text-yellow-400 block mb-2">DICA DE OURO</strong>
+                                <div className="text-foreground text-[15px] md:text-base leading-relaxed">
+                                  {match[1].trim()}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                    }
+                    
+                    // Detectar [SACOU?]
+                    if (text.includes('[SACOU?')) {
+                      const match = text.match(/\[SACOU\?\s*💡?\]([\s\S]*?)\[\/SACOU\?\]/i);
+                      if (match) {
+                        return (
+                          <div className="my-4 p-4 bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg">
+                            <div className="flex items-start gap-3">
+                              <span className="text-2xl flex-shrink-0">💡</span>
+                              <div>
+                                <strong className="text-blue-400 block mb-2">SACOU?</strong>
+                                <div className="text-foreground text-[15px] md:text-base leading-relaxed">
+                                  {match[1].trim()}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                    }
+                    
+                    // Detectar [FICA LIGADO!]
+                    if (text.includes('[FICA LIGADO!')) {
+                      const match = text.match(/\[FICA LIGADO!\s*⚠️?\]([\s\S]*?)\[\/FICA LIGADO!\]/i);
+                      if (match) {
+                        return (
+                          <div className="my-4 p-4 bg-orange-500/10 border-l-4 border-orange-500 rounded-r-lg">
+                            <div className="flex items-start gap-3">
+                              <span className="text-2xl flex-shrink-0">⚠️</span>
+                              <div>
+                                <strong className="text-orange-400 block mb-2">FICA LIGADO!</strong>
+                                <div className="text-foreground text-[15px] md:text-base leading-relaxed">
+                                  {match[1].trim()}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                    }
+                    
+                    // Detectar [ATENÇÃO], [IMPORTANTE], [DICA], [NOTA], [EXEMPLO]
+                    const highlightMatch = text.match(/\[(ATENÇÃO|IMPORTANTE|DICA|NOTA|EXEMPLO)\]([\s\S]*?)\[\/\1\]/i);
+                    if (highlightMatch) {
+                      const type = highlightMatch[1].toLowerCase();
+                      const content = highlightMatch[2].trim();
+                      return <HighlightedBox type={type as any}>{content}</HighlightedBox>;
+                    }
+                    
+                    return (
+                      <p className="text-foreground text-[15px] md:text-base mb-4 leading-relaxed">
+                        {children}
+                      </p>
+                    );
+                  },
+                  ul: ({ children }) => (
+                    <ul className="list-disc list-inside space-y-2 mb-4 ml-4 text-foreground">
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className="list-decimal list-inside space-y-2 mb-4 ml-4 text-foreground">
+                      {children}
+                    </ol>
+                  ),
+                  li: ({ children }) => (
+                    <li className="text-foreground text-[15px] md:text-base leading-relaxed">
+                      {children}
+                    </li>
+                  ),
+                  strong: ({ children }) => (
+                    <strong className="font-bold text-primary">
+                      {children}
+                    </strong>
+                  ),
+                  blockquote: ({ children }) => (
+                    <blockquote className="border-l-4 border-primary/50 pl-6 pr-4 py-4 my-6 bg-primary/5 rounded-r-lg text-foreground/95 text-[15px] leading-relaxed shadow-sm italic">
+                      {children}
+                    </blockquote>
+                  )
+                }}
+              >
+                {textBefore}
+              </ReactMarkdown>
+            </div>
+          );
+        }
+      }
+
+      // Adicionar elemento especial
+      try {
+        if (type === 'comparison') {
+          const title = match[2]?.trim();
+          const jsonStr = match[3]?.trim();
+          const data = JSON.parse(jsonStr);
+          if (data.cards && Array.isArray(data.cards)) {
+            elements.push(<ComparisonCarousel key={key++} title={title} cards={data.cards} />);
+          }
+        } else if (type === 'practical_cases') {
+          const jsonStr = match[1]?.trim();
+          const data = JSON.parse(jsonStr);
+          if (data.cases && Array.isArray(data.cases)) {
+            elements.push(<PracticalCasesCarousel key={key++} cases={data.cases} title="📝 Casos Práticos" />);
+          }
+        } else if (type === 'clickable_questions') {
+          try {
+            const rawContent = match[1]?.trim();
+            let questions;
+            try {
+              questions = JSON.parse(rawContent);
+            } catch (parseError) {
+              const cleaned = rawContent.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+              questions = JSON.parse(cleaned);
+            }
+            if (Array.isArray(questions) && questions.length > 0) {
+              elements.push(
+                <div key={key++} className="my-6">
+                  <h3 className="text-lg md:text-xl font-bold flex items-center gap-2 mb-4">
+                    <MessageCircle className="w-5 h-5 text-primary" />
+                    💭 Questões para Aprofundamento
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {questions.map((question: string, idx: number) => (
+                      <Button
+                        key={idx}
+                        variant="outline"
+                        className="w-full text-left justify-start h-auto py-3 px-4 whitespace-normal break-words hover:bg-primary/10 hover:border-primary transition-all group"
+                        onClick={() => {
+                          setInput(question);
+                          setTimeout(() => sendMessage(), 100);
+                        }}
+                      >
+                        <MessageCircle className="w-4 h-4 mr-2 flex-shrink-0 mt-1 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-sm md:text-base leading-relaxed">{question}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+          } catch (e) {
+            console.error('❌ Erro ao parsear questões clicáveis:', e);
+          }
+        } else if (type === 'infographic') {
+          const title = match[1]?.trim();
+          const jsonStr = match[2]?.trim();
+          const data = JSON.parse(jsonStr);
+          if (data.steps && Array.isArray(data.steps)) {
+            elements.push(<InfographicTimeline key={key++} title={title} steps={data.steps} />);
+          }
+        } else if (type === 'stats') {
+          const title = match[1]?.trim();
+          const jsonStr = match[2]?.trim();
+          const data = JSON.parse(jsonStr);
+          if (data.stats && Array.isArray(data.stats)) {
+            elements.push(<LegalStatistics key={key++} title={title} stats={data.stats} />);
+          }
+        } else if (type === 'process') {
+          const title = match[1]?.trim();
+          const jsonStr = match[2]?.trim();
+          const data = JSON.parse(jsonStr);
+          if (data.steps && Array.isArray(data.steps)) {
+            elements.push(<ProcessFlow key={key++} title={title} steps={data.steps} />);
+          }
+        } else if (type === 'tabs') {
+          const title = match[1]?.trim();
+          const jsonStr = match[2]?.trim();
+          const data = JSON.parse(jsonStr);
+          if (data.tabs && Array.isArray(data.tabs)) {
+            elements.push(<MarkdownTabs key={key++} tabs={data.tabs} />);
+          }
+        } else if (type === 'accordion') {
+          const jsonStr = match[1]?.trim();
+          const data = JSON.parse(jsonStr);
+          if (data.items && Array.isArray(data.items)) {
+            elements.push(<MarkdownAccordion key={key++} items={data.items} />);
+          }
+        } else if (type === 'slides') {
+          const title = match[1]?.trim();
+          const jsonStr = match[2]?.trim();
+          const data = JSON.parse(jsonStr);
+          if (data.slides && Array.isArray(data.slides)) {
+            elements.push(<MarkdownSlides key={key++} title={title} slides={data.slides} />);
+          }
+        }
+      } catch (e) {
+        console.error(`❌ ERRO ao parsear ${type}:`, e);
+        elements.push(
+          <div key={key++} className="prose prose-sm max-w-none dark:prose-invert">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {match[0]}
+            </ReactMarkdown>
+          </div>
+        );
+      }
+
+      lastIndex = endIdx;
+    });
+
+    // Adicionar texto restante
+    if (lastIndex < processedContent.length) {
+      let remainingText = processedContent.substring(lastIndex);
+
+      if (remainingText.trim()) {
+        elements.push(
+          <div key={key++} className="prose prose-sm max-w-none dark:prose-invert">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]} 
+              components={{
+                h1: ({ children }) => (
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-6 mt-8 leading-tight">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4 mt-6 leading-tight">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3 mt-5 leading-snug">
+                    {children}
+                  </h3>
+                ),
+                p: ({ children, node }: any) => {
+                  const text = node?.children?.map((child: any) => child.value || '').join('') || '';
+                  
+                  if (text.includes('[DICA DE OURO')) {
+                    const match = text.match(/\[DICA DE OURO\s*💎?\]([\s\S]*?)\[\/DICA DE OURO\]/i);
+                    if (match) {
+                      return (
+                        <div className="my-4 p-4 bg-yellow-500/10 border-l-4 border-yellow-500 rounded-r-lg">
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl flex-shrink-0">💎</span>
+                            <div>
+                              <strong className="text-yellow-400 block mb-2">DICA DE OURO</strong>
+                              <div className="text-foreground text-[15px] md:text-base leading-relaxed">
+                                {match[1].trim()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  }
+                  
+                  if (text.includes('[SACOU?')) {
+                    const match = text.match(/\[SACOU\?\s*💡?\]([\s\S]*?)\[\/SACOU\?\]/i);
+                    if (match) {
+                      return (
+                        <div className="my-4 p-4 bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg">
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl flex-shrink-0">💡</span>
+                            <div>
+                              <strong className="text-blue-400 block mb-2">SACOU?</strong>
+                              <div className="text-foreground text-[15px] md:text-base leading-relaxed">
+                                {match[1].trim()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  }
+                  
+                  if (text.includes('[FICA LIGADO!')) {
+                    const match = text.match(/\[FICA LIGADO!\s*⚠️?\]([\s\S]*?)\[\/FICA LIGADO!\]/i);
+                    if (match) {
+                      return (
+                        <div className="my-4 p-4 bg-orange-500/10 border-l-4 border-orange-500 rounded-r-lg">
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl flex-shrink-0">⚠️</span>
+                            <div>
+                              <strong className="text-orange-400 block mb-2">FICA LIGADO!</strong>
+                              <div className="text-foreground text-[15px] md:text-base leading-relaxed">
+                                {match[1].trim()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  }
+                  
+                  const highlightMatch = text.match(/\[(ATENÇÃO|IMPORTANTE|DICA|NOTA|EXEMPLO)\]([\s\S]*?)\[\/\1\]/i);
+                  if (highlightMatch) {
+                    const type = highlightMatch[1].toLowerCase();
+                    const content = highlightMatch[2].trim();
+                    return <HighlightedBox type={type as any}>{content}</HighlightedBox>;
+                  }
+                  
+                  return (
+                    <p className="text-foreground text-[15px] md:text-base mb-4 leading-relaxed">
+                      {children}
+                    </p>
+                  );
+                },
+                ul: ({ children }) => (
+                  <ul className="list-disc list-inside space-y-2 mb-4 ml-4 text-foreground">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal list-inside space-y-2 mb-4 ml-4 text-foreground">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-foreground text-[15px] md:text-base leading-relaxed">
+                    {children}
+                  </li>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-bold text-primary">
+                    {children}
+                  </strong>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-primary/50 pl-6 pr-4 py-4 my-6 bg-primary/5 rounded-r-lg text-foreground/95 text-[15px] leading-relaxed shadow-sm italic">
+                    {children}
+                  </blockquote>
+                )
+              }}
+            >
+              {remainingText}
+            </ReactMarkdown>
+          </div>
+        );
+      }
+    }
+
+    return elements.length > 0 ? <>{elements}</> : null;
+  };
+
   const renderWelcomeScreen = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-6 px-6">
@@ -250,219 +784,241 @@ export const ProfessoraChatDesktop = ({ isOpen, onClose }: ProfessoraChatDesktop
       {/* Overlay escuro e fosco */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
       
-      {/* Conteúdo centralizado estilo ChatGPT */}
-      <div className="relative z-50 flex flex-col w-full max-w-4xl mx-auto my-8 bg-background rounded-lg shadow-2xl">
-        {/* Header fixo */}
-        <div className="border-b border-border bg-card px-6 py-4 flex-shrink-0">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold">Professora Jurídica</h1>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="w-5 h-5" />
-          </Button>
-        </div>
-
-        <Tabs value={mode} onValueChange={(v) => handleModeChange(v as ChatMode)}>
-          <TabsList className="w-full grid grid-cols-4">
-            <TabsTrigger value="study" className="gap-2">
+      {/* Container principal com grid para sidebar + conteúdo */}
+      <div className="relative z-50 flex w-full max-w-7xl mx-auto my-8">
+        <div className="flex w-full bg-background rounded-lg shadow-2xl overflow-hidden">
+          
+          {/* Sidebar Lateral Esquerda */}
+          <div className="w-[200px] bg-card border-r border-border flex flex-col p-4 gap-2 flex-shrink-0">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-sm font-semibold text-muted-foreground">Modo</h2>
+            </div>
+            
+            {/* Botões de Modo - Verticais */}
+            <Button
+              variant={mode === "study" ? "default" : "ghost"}
+              onClick={() => handleModeChange("study")}
+              className="w-full justify-start gap-2"
+            >
               <BookOpen className="w-4 h-4" />
-              Estudo
-            </TabsTrigger>
-            <TabsTrigger value="aula" className="gap-2">
+              <span className="text-sm">Estudo</span>
+            </Button>
+            
+            <Button
+              variant={mode === "aula" ? "default" : "ghost"}
+              onClick={() => handleModeChange("aula")}
+              className="w-full justify-start gap-2"
+            >
               <GraduationCap className="w-4 h-4" />
-              Aula
-            </TabsTrigger>
-            <TabsTrigger value="recommendation" className="gap-2">
+              <span className="text-sm">Aula</span>
+            </Button>
+            
+            <Button
+              variant={mode === "recommendation" ? "default" : "ghost"}
+              onClick={() => handleModeChange("recommendation")}
+              className="w-full justify-start gap-2"
+            >
               <Lightbulb className="w-4 h-4" />
-              Material
-            </TabsTrigger>
-            <TabsTrigger value="realcase" className="gap-2">
+              <span className="text-sm">Material</span>
+            </Button>
+            
+            <Button
+              variant={mode === "realcase" ? "default" : "ghost"}
+              onClick={() => handleModeChange("realcase")}
+              className="w-full justify-start gap-2"
+            >
               <Scale className="w-4 h-4" />
-              Caso Real
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+              <span className="text-sm">Caso Real</span>
+            </Button>
 
-        {/* Toggle Linguagem */}
-        <div className="flex items-center justify-center gap-2 mt-4">
-          <div className="flex gap-1 p-1 bg-muted rounded-lg">
-            <Button
-              onClick={() => {
-                if (linguagemMode !== 'descomplicado') {
-                  setLinguagemMode('descomplicado');
-                  limparConversa();
-                }
-              }}
-              variant={linguagemMode === 'descomplicado' ? 'default' : 'ghost'}
-              size="sm"
-              className={cn(
-                "text-xs gap-1.5",
-                linguagemMode === 'descomplicado' && "bg-primary text-primary-foreground"
-              )}
-            >
-              <span>😊</span>
-              Descomplicado
-            </Button>
-            <Button
-              onClick={() => {
-                if (linguagemMode !== 'tecnico') {
-                  setLinguagemMode('tecnico');
-                  limparConversa();
-                }
-              }}
-              variant={linguagemMode === 'tecnico' ? 'default' : 'ghost'}
-              size="sm"
-              className={cn(
-                "text-xs gap-1.5",
-                linguagemMode === 'tecnico' && "bg-primary text-primary-foreground"
-              )}
-            >
-              <span>⚖️</span>
-              Modo Técnico
-            </Button>
+            <Separator className="my-2" />
+
+            {/* Toggle de Linguagem - Vertical */}
+            <div className="space-y-2">
+              <h2 className="text-sm font-semibold text-muted-foreground mb-2">Linguagem</h2>
+              
+              <Button
+                variant={linguagemMode === "descomplicado" ? "default" : "ghost"}
+                size="sm"
+                className="w-full justify-start gap-2"
+                onClick={() => {
+                  if (linguagemMode !== 'descomplicado') {
+                    setLinguagemMode('descomplicado');
+                    limparConversa();
+                  }
+                }}
+              >
+                <span>😊</span>
+                <span className="text-xs">Descomplicado</span>
+              </Button>
+              
+              <Button
+                variant={linguagemMode === "tecnico" ? "default" : "ghost"}
+                size="sm"
+                className="w-full justify-start gap-2"
+                onClick={() => {
+                  if (linguagemMode !== 'tecnico') {
+                    setLinguagemMode('tecnico');
+                    limparConversa();
+                  }
+                }}
+              >
+                <span>⚖️</span>
+                <span className="text-xs">Técnico</span>
+              </Button>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Messages Area - com altura definida */}
-      <div className="flex-1 overflow-hidden" style={{ maxHeight: 'calc(100vh - 400px)' }}>
-        <ScrollArea ref={scrollRef} className="h-full py-4">
-          {messages.length === 0 ? (
-            renderWelcomeScreen()
-          ) : (
-            <div className="space-y-4 px-6 max-w-5xl mx-auto">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "flex",
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "rounded-2xl px-4 py-3",
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground max-w-[80%]"
-                        : "bg-muted max-w-[90%]"
-                    )}
-                  >
-                    {message.role === "assistant" ? (
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {message.content}
-                        </ReactMarkdown>
+          {/* Área de Chat Principal */}
+          <div className="flex-1 flex flex-col">
+            {/* Header Simplificado */}
+            <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between flex-shrink-0">
+              <h1 className="text-xl font-bold">Professora Jurídica</h1>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Messages Area - com altura definida */}
+            <div className="flex-1 overflow-hidden" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+              <ScrollArea ref={scrollRef} className="h-full py-4">
+                {messages.length === 0 ? (
+                  renderWelcomeScreen()
+                ) : (
+                  <div className="space-y-4 px-6 max-w-4xl mx-auto">
+                    {messages.map((message, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "flex",
+                          message.role === "user" ? "justify-end" : "justify-start"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "rounded-2xl px-4 py-3",
+                            message.role === "user"
+                              ? "bg-primary/60 text-primary-foreground max-w-[80%]"
+                              : "bg-muted max-w-[90%]"
+                          )}
+                        >
+                          {message.role === "assistant" ? (
+                            <div className="text-[15px] md:text-base">
+                              {parseSpecialContent(message.content)}
+                            </div>
+                          ) : (
+                            <p className="whitespace-pre-wrap text-[15px]">{message.content}</p>
+                          )}
+                        </div>
                       </div>
-                    ) : (
-                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    ))}
+
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-muted rounded-2xl px-4 py-3 flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span className="text-sm">Professora está pensando...</span>
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
-              ))}
+                )}
+              </ScrollArea>
+            </div>
 
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-muted rounded-2xl px-4 py-3 flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">Professora está pensando...</span>
+            {/* Footer estilo ChatGPT - sempre visível e fixo */}
+            <div className="flex-shrink-0 px-6 py-4 bg-background border-t border-border">
+              {uploadedFiles.length > 0 && (
+                <div className="mb-3">
+                  <div className="flex flex-wrap gap-2">
+                    {uploadedFiles.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2 text-sm"
+                      >
+                        {file.type.includes("image") ? (
+                          <Image className="w-4 h-4" />
+                        ) : (
+                          <FileText className="w-4 h-4" />
+                        )}
+                        <span className="max-w-[120px] truncate">{file.name}</span>
+                        <button onClick={() => removeFile(index)}>
+                          <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
-            </div>
-          )}
-        </ScrollArea>
-      </div>
 
-      {/* Footer estilo ChatGPT - sempre visível e fixo */}
-      <div className="flex-shrink-0 px-6 py-4 bg-background border-t border-border">
-        {uploadedFiles.length > 0 && (
-          <div className="mb-3">
-            <div className="flex flex-wrap gap-2">
-              {uploadedFiles.map((file, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2 text-sm"
-                >
-                  {file.type.includes("image") ? (
-                    <Image className="w-4 h-4" />
-                  ) : (
-                    <FileText className="w-4 h-4" />
-                  )}
-                  <span className="max-w-[120px] truncate">{file.name}</span>
-                  <button onClick={() => removeFile(index)}>
-                    <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-                  </button>
+              {/* Container estilo ChatGPT */}
+              <div className="bg-muted/30 rounded-2xl border border-border/50 shadow-sm">
+                {mode !== "recommendation" && (
+                  <div className="px-4 pt-3 pb-2 flex gap-2 border-b border-border/30">
+                    <input
+                      ref={imageInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        e.target.files?.[0] && handleFileSelect(e.target.files[0], "image")
+                      }
+                      className="hidden"
+                    />
+                    <button
+                      onClick={() => imageInputRef.current?.click()}
+                      disabled={isLoading}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-xs font-medium disabled:opacity-50"
+                    >
+                      <Image className="w-4 h-4" />
+                      <span>Imagem</span>
+                    </button>
+
+                    <input
+                      ref={pdfInputRef}
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) =>
+                        e.target.files?.[0] && handleFileSelect(e.target.files[0], "pdf")
+                      }
+                      className="hidden"
+                    />
+                    <button
+                      onClick={() => pdfInputRef.current?.click()}
+                      disabled={isLoading}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-xs font-medium disabled:opacity-50"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>PDF</span>
+                    </button>
+                  </div>
+                )}
+
+                <div className="px-4 py-3 flex items-center gap-3">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Digite sua pergunta..."
+                    disabled={isLoading}
+                    className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                  <Button
+                    onClick={sendMessage}
+                    disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
+                    size="icon"
+                    className="rounded-lg shrink-0"
+                  >
+                    {isLoading ? (
+                      <Brain className="w-5 h-5 animate-pulse" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </Button>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Container estilo ChatGPT */}
-        <div className="bg-muted/30 rounded-2xl border border-border/50 shadow-sm">
-          {mode !== "recommendation" && (
-            <div className="px-4 pt-3 pb-2 flex gap-2 border-b border-border/30">
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  e.target.files?.[0] && handleFileSelect(e.target.files[0], "image")
-                }
-                className="hidden"
-              />
-              <button
-                onClick={() => imageInputRef.current?.click()}
-                disabled={isLoading}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-xs font-medium disabled:opacity-50"
-              >
-                <Image className="w-4 h-4" />
-                <span>Imagem</span>
-              </button>
-
-              <input
-                ref={pdfInputRef}
-                type="file"
-                accept="application/pdf"
-                onChange={(e) =>
-                  e.target.files?.[0] && handleFileSelect(e.target.files[0], "pdf")
-                }
-                className="hidden"
-              />
-              <button
-                onClick={() => pdfInputRef.current?.click()}
-                disabled={isLoading}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-xs font-medium disabled:opacity-50"
-              >
-                <FileText className="w-4 h-4" />
-                <span>PDF</span>
-              </button>
-            </div>
-          )}
-
-          <div className="px-4 py-3 flex items-center gap-3">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Digite sua pergunta..."
-              disabled={isLoading}
-              className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-            <Button
-              onClick={sendMessage}
-              disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
-              size="icon"
-              className="rounded-lg shrink-0"
-            >
-              {isLoading ? (
-                <Brain className="w-5 h-5 animate-pulse" />
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </Button>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
