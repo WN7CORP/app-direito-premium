@@ -63,7 +63,7 @@ export default function IniciandoDireitoTemas() {
   return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-[600px] lg:max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
             
           </div>
@@ -81,7 +81,7 @@ export default function IniciandoDireitoTemas() {
       </div>
 
       {/* Conteúdo */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-[600px] lg:max-w-4xl mx-auto px-4 py-6">
         {/* Timeline de Temas */}
         <div className="relative space-y-6">
           {/* Linha vertical */}

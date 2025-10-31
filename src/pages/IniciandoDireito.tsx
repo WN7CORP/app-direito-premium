@@ -84,7 +84,7 @@ export default function IniciandoDireito() {
   return <div className="min-h-screen bg-gradient-to-br from-background via-card to-background pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-[600px] lg:max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
             
           </div>
@@ -104,7 +104,7 @@ export default function IniciandoDireito() {
       </div>
 
       {/* Conteúdo */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-[600px] lg:max-w-4xl mx-auto px-4 py-6">
         <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-6 mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-primary" />
