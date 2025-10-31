@@ -75,7 +75,7 @@ export const CursosCarousel = () => {
           >
             {/* Container da imagem - limpo, sem texto sobreposto */}
             <div 
-              className="relative rounded-xl overflow-hidden border-2 shadow-lg hover:shadow-2xl transition-all duration-300 mb-3"
+              className="relative rounded-xl overflow-hidden border-2 shadow-xl hover:shadow-2xl transition-all duration-300 mb-3"
               style={{
                 backgroundColor: curso.corHex + '20',
                 borderColor: curso.corHex + '40'
@@ -128,12 +128,10 @@ export const CursosCarousel = () => {
 
             {/* Informações ABAIXO da capa */}
             <div className="px-1">
-              <div className="mb-1">
-                <p className="text-xs font-semibold text-muted-foreground">
-                  {curso.area}
-                </p>
-              </div>
-              <h3 className="font-bold text-sm leading-tight line-clamp-2 text-foreground">
+              <p className="text-xs text-muted-foreground mb-1">
+                {curso.area}
+              </p>
+              <h3 className="font-bold text-sm leading-tight line-clamp-2 text-foreground/80">
                 {curso.tema}
               </h3>
             </div>
