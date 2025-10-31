@@ -43,9 +43,17 @@ const CORES_AREAS: Record<string, { hex: string; glow: string }> = {
     hex: "#06b6d4",
     glow: "0 0 30px rgba(6, 182, 212, 0.5)"
   },
+  "Processo Civil": { 
+    hex: "#06b6d4",
+    glow: "0 0 30px rgba(6, 182, 212, 0.5)"
+  },
   "Direito Processual Penal": { 
     hex: "#f97316",
     glow: "0 0 30px rgba(249, 115, 22, 0.5)"
+  },
+  "Direito do Trabalho": { 
+    hex: "#f59e0b",
+    glow: "0 0 30px rgba(245, 158, 11, 0.5)"
   }
 };
 export default function IniciandoDireito() {
