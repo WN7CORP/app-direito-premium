@@ -129,10 +129,7 @@ export const CursosCarousel = () => {
             {/* Informações ABAIXO da capa */}
             <div className="px-1">
               <div className="mb-1">
-                <p 
-                  className="text-xs font-semibold"
-                  style={{ color: curso.corHex }}
-                >
+                <p className="text-xs font-semibold text-muted-foreground">
                   {curso.area}
                 </p>
               </div>
