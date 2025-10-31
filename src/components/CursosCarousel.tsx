@@ -71,14 +71,13 @@ export const CursosCarousel = () => {
           <div
             key={idx}
             onClick={() => navigate(`/iniciando-direito/${encodeURIComponent(curso.area)}/${encodeURIComponent(curso.tema)}`)}
-            className="flex-shrink-0 w-[320px] cursor-pointer hover:scale-105 transition-all duration-300 group"
+            className="flex-shrink-0 w-[320px] cursor-pointer hover:scale-105 transition-all duration-300 group bg-card rounded-xl overflow-hidden shadow-lg hover:shadow-2xl border border-border"
           >
             {/* Container da imagem - limpo, sem texto sobreposto */}
             <div 
-              className="relative rounded-xl overflow-hidden border-2 shadow-xl hover:shadow-2xl transition-all duration-300 mb-3"
+              className="relative overflow-hidden"
               style={{
-                backgroundColor: curso.corHex + '20',
-                borderColor: curso.corHex + '40'
+                backgroundColor: curso.corHex + '20'
               }}
             >
               {/* Imagem da capa */}
@@ -127,7 +126,7 @@ export const CursosCarousel = () => {
             </div>
 
             {/* Informações ABAIXO da capa */}
-            <div className="bg-card rounded-xl p-3 shadow-lg border border-border">
+            <div className="p-3">
               <p className="text-xs text-muted-foreground mb-1">
                 {curso.area}
               </p>
