@@ -27,9 +27,9 @@ serve(async (req) => {
 
     console.log('✅ Validação de dados OK');
 
-    // Importar jsPDF dinamicamente
+    // Importar jsPDF dinamicamente via esm.sh
     console.log('📦 Importando jsPDF...');
-    const { jsPDF } = await import('https://cdn.skypack.dev/jspdf@2.5.1');
+    const { default: jsPDF } = await import('https://esm.sh/jspdf@2.5.2');
     console.log('✅ jsPDF importado');
     
     const doc = new jsPDF();
