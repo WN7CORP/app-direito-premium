@@ -138,11 +138,12 @@ export const AppSidebar = ({ onClose }: AppSidebarProps = {}) => {
       <div className="px-4 pb-2">
         <button
           onClick={() => {
-            // No mobile (quando tem onClose), apenas fecha o menu
             if (onClose) {
+              // Mobile: abre o chat do rodapé e fecha a sidebar
+              navigate('/chat-professora');
               onClose();
             } else {
-              // No desktop, abre o modal
+              // Desktop: abre o modal lateral
               setProfessoraModalOpen(true);
             }
           }}
