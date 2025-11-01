@@ -185,11 +185,11 @@ export default function Ajuda() {
                       Entre em contato por e-mail para questões mais detalhadas
                     </p>
                     <div className="space-y-3">
-                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <code className="flex-1 px-3 py-2 bg-muted rounded text-sm text-center sm:text-left">
+                      <div className="flex flex-col items-center gap-2">
+                        <code className="w-full px-3 py-2 bg-muted rounded text-sm text-center">
                           wn7corporation@gmail.com
                         </code>
-                        <Button size="icon" variant="outline" onClick={copyEmail} className="self-center sm:self-auto">
+                        <Button size="icon" variant="outline" onClick={copyEmail}>
                           <Copy className="w-4 h-4" />
                         </Button>
                       </div>
