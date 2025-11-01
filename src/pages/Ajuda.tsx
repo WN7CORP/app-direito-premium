@@ -10,7 +10,6 @@ import {
   Scale, 
   User, 
   FileText, 
-  Gamepad2, 
   HelpCircle,
   Mail,
   Copy,
@@ -40,40 +39,52 @@ export default function Ajuda() {
 
   const faqCategories = [
     {
-      id: "aprendizado",
-      title: "Aprendizado",
+      id: "funcionalidades",
+      title: "Funcionalidades",
       icon: Book,
       questions: [
         {
-          q: "Como acessar os cursos e videoaulas?",
-          a: 'Acesse o menu "Aprender" e escolha entre Cursos, Videoaulas ou Audioaulas. Todo o conteúdo está organizado por área do Direito.'
+          q: "A Professora funciona 24 horas?",
+          a: "Sim! A Professora está disponível 24 horas por dia, 7 dias por semana para tirar suas dúvidas e ajudar nos seus estudos."
         },
         {
-          q: "Os flashcards são gratuitos?",
-          a: "Sim! Todos os flashcards estão disponíveis gratuitamente. Acesse em Aprender > Flashcards."
+          q: "Posso acessar pelo computador?",
+          a: "Sim! O Direito Premium pode ser acessado tanto pelo celular quanto pelo computador, tablet ou qualquer dispositivo com internet."
         },
         {
-          q: "Como funciona o plano de estudos personalizado?",
-          a: "Na seção Ferramentas, você encontra o Gerador de Plano de Estudos. Responda algumas perguntas e receba um cronograma personalizado."
+          q: "Se eu pagar, tenho acesso para sempre?",
+          a: "Sim! O pagamento é único e você terá acesso vitalício a todo o conteúdo e atualizações futuras."
+        },
+        {
+          q: "Serve para concurso, OAB e faculdade?",
+          a: "Sim! O conteúdo foi desenvolvido para atender estudantes de Direito em todas as etapas: faculdade, preparação para OAB e concursos públicos."
+        },
+        {
+          q: "As leis são atualizadas?",
+          a: "Sim! Nosso conteúdo é atualizado regularmente com as últimas alterações legislativas e jurisprudenciais."
         }
       ]
     },
     {
-      id: "ferramentas",
-      title: "Ferramentas Jurídicas",
+      id: "conteudo",
+      title: "Conteúdo",
       icon: Scale,
       questions: [
+        {
+          q: "Como acessar os cursos e videoaulas?",
+          a: 'Acesse o menu "Faculdade" e escolha entre Cursos, Videoaulas ou Audioaulas. Todo o conteúdo está organizado por área do Direito.'
+        },
+        {
+          q: "Os flashcards são gratuitos?",
+          a: "Sim! Todos os flashcards estão disponíveis gratuitamente. Acesse em Faculdade > Flashcards."
+        },
         {
           q: "O Vade Mecum está atualizado?",
           a: "Sim! Nosso Vade Mecum é atualizado regularmente com as últimas alterações legislativas."
         },
         {
-          q: "Como buscar jurisprudência?",
-          a: 'Acesse "Jurisprudência" no menu e use os filtros por tribunal, área do direito e palavras-chave.'
-        },
-        {
           q: "Posso baixar os materiais para estudar offline?",
-          a: "Alguns materiais como PDFs de resumos e petições podem ser salvos. Use o botão de download quando disponível."
+          a: "Alguns materiais como PDFs de resumos podem ser salvos. Use o botão de download quando disponível."
         }
       ]
     },
@@ -97,44 +108,6 @@ export default function Ajuda() {
       ]
     },
     {
-      id: "documentos",
-      title: "Documentos e Petições",
-      icon: FileText,
-      questions: [
-        {
-          q: "Como gerar uma petição?",
-          a: 'Acesse "Ferramentas" > "Advogado IA" e escolha o tipo de petição. Preencha os dados e a IA gerará o documento.'
-        },
-        {
-          q: "Posso editar as petições geradas?",
-          a: "Sim! Todas as petições podem ser editadas antes de exportar para PDF."
-        },
-        {
-          q: "Os documentos são salvos automaticamente?",
-          a: "Sim, seus documentos ficam disponíveis no histórico do Advogado IA."
-        }
-      ]
-    },
-    {
-      id: "jogos",
-      title: "Jogos e Simulações",
-      icon: Gamepad2,
-      questions: [
-        {
-          q: "Como funcionam as simulações de audiência?",
-          a: "Escolha um caso, selecione provas e argumentos, e enfrente um advogado virtual. Você recebe feedback em tempo real da juíza."
-        },
-        {
-          q: "Os jogos ajudam no aprendizado?",
-          a: "Sim! Jogos como Forca, Stop e Palavras Cruzadas reforçam conceitos jurídicos de forma lúdica."
-        },
-        {
-          q: "Posso repetir as simulações?",
-          a: "Sim! Você pode jogar quantas vezes quiser para melhorar sua pontuação."
-        }
-      ]
-    },
-    {
       id: "outros",
       title: "Outros",
       icon: HelpCircle,
@@ -148,8 +121,8 @@ export default function Ajuda() {
           a: "Use o chat de suporte clicando no botão 'Falar com Suporte' ou entre em contato pelo e-mail da equipe."
         },
         {
-          q: "Vocês oferecem certificados?",
-          a: "Atualmente não oferecemos certificados, mas estamos trabalhando nessa funcionalidade!"
+          q: "Como funciona o plano de estudos personalizado?",
+          a: "Na seção Ferramentas, você encontra o Gerador de Plano de Estudos. Responda algumas perguntas e receba um cronograma personalizado."
         }
       ]
     }
