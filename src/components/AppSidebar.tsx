@@ -33,10 +33,12 @@ import {
   FileCheck2,
   ClipboardCheck,
   MessageCircle,
-  HelpCircle
+  HelpCircle,
+  Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProfessoraChatDesktop } from "./ProfessoraChatDesktop";
+import { AvaliarAppModal } from "./AvaliarAppModal";
 
 interface AppSidebarProps {
   onClose?: () => void;
@@ -46,6 +48,7 @@ export const AppSidebar = ({ onClose }: AppSidebarProps = {}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [professoraModalOpen, setProfessoraModalOpen] = useState(false);
+  const [avaliarModalOpen, setAvaliarModalOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -112,8 +115,19 @@ export const AppSidebar = ({ onClose }: AppSidebarProps = {}) => {
         </div>
       </div>
 
-      {/* Professora - Destaque vermelho */}
+      {/* Avaliar App - Destaque amarelo */}
       <div className="px-4 pt-4 pb-2">
+        <button
+          onClick={() => setAvaliarModalOpen(true)}
+          className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 transition-all text-left border border-yellow-500/30"
+        >
+          <Star className="w-5 h-5 text-yellow-500 animate-pulse" />
+          <span className="text-sm font-medium text-foreground">Avaliar App</span>
+        </button>
+      </div>
+
+      {/* Professora - Destaque vermelho */}
+      <div className="px-4 pb-2">
         <button
           onClick={() => setProfessoraModalOpen(true)}
           className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 transition-all text-left border border-red-500/30"
@@ -268,6 +282,13 @@ export const AppSidebar = ({ onClose }: AppSidebarProps = {}) => {
       <ProfessoraChatDesktop 
         isOpen={professoraModalOpen} 
         onClose={() => setProfessoraModalOpen(false)} 
+      />
+      
+      <AvaliarAppModal 
+        open={avaliarModalOpen}
+        onOpenChange={setAvaliarModalOpen}
+        onRated={() => setAvaliarModalOpen(false)}
+        onPostpone={() => setAvaliarModalOpen(false)}
       />
     </div>
   );
