@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDropzone } from "react-dropzone";
 
 type InputType = "texto" | "pdf" | "imagem";
+type ResumoLevel = "detalhado" | "resumido";
 
 const ResumosJuridicos = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const ResumosJuridicos = () => {
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState("");
   const [extractedText, setExtractedText] = useState<string | null>(null);
-  const [selectedLevel, setSelectedLevel] = useState<"detalhado" | "resumido" | "super_resumido" | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<ResumoLevel | null>(null);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: inputType === "pdf" 
@@ -66,6 +67,15 @@ const ResumosJuridicos = () => {
   };
 
   const handleAnalyze = async () => {
+    if (!selectedLevel) {
+      toast({
+        title: "Selecione o tipo de resumo",
+        description: "É obrigatório escolher entre Resumido ou Detalhado.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (inputType === "texto" && !texto.trim()) {
       toast({
         title: "Campo vazio",
@@ -155,8 +165,16 @@ const ResumosJuridicos = () => {
     }
   };
 
-  const handleSummarize = async (nivel: "detalhado" | "resumido" | "super_resumido") => {
-    setSelectedLevel(nivel);
+  const handleSummarize = async () => {
+    if (!selectedLevel) {
+      toast({
+        title: "Erro",
+        description: "Nível de resumo não selecionado.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsProcessing(true);
     setProgress(0);
     const progressInterval = simulateProgress(progressStepsSummarize);
@@ -179,7 +197,7 @@ const ResumosJuridicos = () => {
           arquivo: arquivoBase64,
           nomeArquivo: arquivo?.name,
           acao: "resumir",
-          nivel,
+          nivel: selectedLevel,
         },
       });
 
@@ -236,8 +254,54 @@ const ResumosJuridicos = () => {
       </div>
 
       <div className="space-y-6">
-        {/* Seleção de tipo de input */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* ETAPA 1: Selecionar tipo de resumo - OBRIGATÓRIO */}
+        <Card className="border-accent/50">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">
+                1️⃣ Escolha o tipo de resumo
+              </Label>
+              <span className="text-xs text-accent font-medium px-2 py-1 bg-accent/10 rounded">
+                Obrigatório
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant={selectedLevel === "resumido" ? "default" : "outline"}
+                className={`h-auto py-4 flex flex-col gap-2 ${
+                  selectedLevel === "resumido" ? "ring-2 ring-accent" : ""
+                }`}
+                onClick={() => setSelectedLevel("resumido")}
+              >
+                <span className="text-lg">📋</span>
+                <div>
+                  <div className="font-semibold">Resumido</div>
+                  <div className="text-xs opacity-80">Principais pontos</div>
+                </div>
+              </Button>
+              <Button
+                variant={selectedLevel === "detalhado" ? "default" : "outline"}
+                className={`h-auto py-4 flex flex-col gap-2 ${
+                  selectedLevel === "detalhado" ? "ring-2 ring-accent" : ""
+                }`}
+                onClick={() => setSelectedLevel("detalhado")}
+              >
+                <span className="text-lg">📚</span>
+                <div>
+                  <div className="font-semibold">Detalhado</div>
+                  <div className="text-xs opacity-80">Análise completa</div>
+                </div>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ETAPA 2: Seleção de tipo de input */}
+        <div>
+          <Label className="text-base font-semibold mb-3 block">
+            2️⃣ Escolha o formato do conteúdo
+          </Label>
+          <div className="grid grid-cols-3 gap-3">
           <Card
             className={`cursor-pointer transition-all ${
               inputType === "texto"
@@ -294,9 +358,10 @@ const ResumosJuridicos = () => {
               <span className="text-sm font-medium">Imagem</span>
             </CardContent>
           </Card>
+          </div>
         </div>
 
-        {/* Input de texto */}
+        {/* ETAPA 3: Input de conteúdo */}
         {inputType === "texto" && (
           <div className="space-y-2">
             <Label htmlFor="texto">Digite ou cole seu texto</Label>
@@ -343,22 +408,22 @@ const ResumosJuridicos = () => {
         )}
 
         {extractedText && !isProcessing ? (
-          <div className="space-y-3">
-            <Label>Escolha o nível do resumo</Label>
-            <div className="grid grid-cols-3 gap-2">
-              <Button variant="secondary" onClick={() => handleSummarize("detalhado")}>Detalhado</Button>
-              <Button variant="secondary" onClick={() => handleSummarize("resumido")}>Resumido</Button>
-              <Button variant="secondary" onClick={() => handleSummarize("super_resumido")}>Super resumido</Button>
-            </div>
-          </div>
+          <Button
+            onClick={handleSummarize}
+            size="lg"
+            className="w-full bg-gradient-to-r from-accent to-primary"
+            disabled={!selectedLevel}
+          >
+            Gerar Resumo {selectedLevel === "resumido" ? "Resumido" : "Detalhado"}
+          </Button>
         ) : (
           <Button
             onClick={handleAnalyze}
             size="lg"
-            className="w-full"
-            disabled={isProcessing}
+            className="w-full bg-gradient-to-r from-accent to-primary"
+            disabled={isProcessing || !selectedLevel}
           >
-            Gerar Resumo
+            {!selectedLevel ? "Escolha o tipo de resumo primeiro" : "Analisar e Gerar Resumo"}
           </Button>
         )}
       </div>
