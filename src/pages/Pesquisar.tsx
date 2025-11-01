@@ -96,7 +96,7 @@ const Pesquisar = () => {
   const navigate = useNavigate();
 
   // Pre-carregar todos os dados uma vez
-  const { data: allCursos, isLoading: cursosLoading } = useQuery({
+  const { data: allCursos } = useQuery({
     queryKey: ["all-cursos"],
     queryFn: async () => {
       const { data } = await supabase.from('CURSOS' as any).select('*');
@@ -106,34 +106,6 @@ const Pesquisar = () => {
     gcTime: 15 * 60 * 1000, // 15 minutos (antes cacheTime)
     refetchOnWindowFocus: false
   });
-
-  // Processar lista de cursos únicos por tema
-  const cursosDisponiveis = useMemo(() => {
-    if (!allCursos) return [];
-    
-    const seen = new Set<string>();
-    const cursos: Array<{ tema: string; area: string; total: number }> = [];
-    
-    allCursos.forEach((curso: any) => {
-      const key = `${curso.Area}-${curso.Tema}`;
-      if (!seen.has(key) && curso.Tema) {
-        seen.add(key);
-        
-        // Contar quantas aulas tem neste tema
-        const total = allCursos.filter((c: any) => 
-          c.Area === curso.Area && c.Tema === curso.Tema
-        ).length;
-        
-        cursos.push({
-          tema: curso.Tema,
-          area: curso.Area,
-          total
-        });
-      }
-    });
-    
-    return cursos.sort((a, b) => a.tema.localeCompare(b.tema));
-  }, [allCursos]);
 
   const { data: allFlashcards } = useQuery({
     queryKey: ["all-flashcards"],
@@ -559,70 +531,11 @@ const Pesquisar = () => {
       )}
 
       {!isSearching && !hasSearched && (
-        <div className="space-y-6">
-          {/* Cursos Disponíveis */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-blue-500" />
-                Cursos do App
-              </h2>
-              {cursosDisponiveis.length > 0 && (
-                <Badge variant="secondary" className="h-6 px-2 text-xs">
-                  {cursosDisponiveis.length} temas
-                </Badge>
-              )}
-            </div>
-
-            {cursosLoading ? (
-              <SmartLoadingIndicator nome="Cursos" />
-            ) : cursosDisponiveis.length > 0 ? (
-              <div className="space-y-2">
-                {cursosDisponiveis.map((curso, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      // Buscar primeira aula deste tema
-                      const primeiraAula = allCursos?.find((c: any) => 
-                        c.Area === curso.area && c.Tema === curso.tema
-                      );
-                      if (primeiraAula) {
-                        navigate(`/iniciando-direito/${encodeURIComponent(curso.area)}/${encodeURIComponent(curso.tema)}`);
-                      }
-                    }}
-                    className="w-full bg-card hover:bg-accent/10 border rounded-lg p-4 text-left transition-all group"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-blue-500 mb-1">{curso.area}</p>
-                        <h3 className="font-semibold text-sm line-clamp-2">{curso.tema}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {curso.total} {curso.total === 1 ? 'aula' : 'aulas'}
-                        </p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent flex-shrink-0" />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <GraduationCap className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">Nenhum curso disponível</p>
-              </div>
-            )}
-          </div>
-
-          {/* Mensagem de busca */}
-          <div className="text-center py-8 border-t">
-            <Search className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">
-              {query.length === 0 
-                ? 'Digite algo para buscar em videoaulas, livros, flashcards e mais' 
-                : `Digite mais ${3 - query.length} caractere${3 - query.length > 1 ? 's' : ''} para buscar`
-              }
-            </p>
-          </div>
+        <div className="text-center py-16">
+          <Search className="w-14 h-14 text-muted-foreground mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground">
+            {query.length === 0 ? 'Digite algo para iniciar' : `Digite mais ${3 - query.length} caractere${3 - query.length > 1 ? 's' : ''}`}
+          </p>
         </div>
       )}
 
