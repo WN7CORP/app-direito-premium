@@ -36,21 +36,14 @@ import {
   HelpCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSidebar } from "@/components/ui/sidebar";
 import { ProfessoraChatDesktop } from "./ProfessoraChatDesktop";
 
 export const AppSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setOpenMobile } = useSidebar();
   const [professoraModalOpen, setProfessoraModalOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
-
-  const handleAjudaClick = () => {
-    navigate('/ajuda');
-    setOpenMobile(false);
-  };
 
   const leisSections = [
     {
@@ -257,7 +250,7 @@ export const AppSidebar = () => {
       {/* Ajuda - Fixo no rodapé */}
       <div className="p-4 border-t border-border bg-card">
         <button
-          onClick={handleAjudaClick}
+          onClick={() => navigate('/ajuda')}
           className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-accent/10 hover:bg-accent/20 transition-all text-left border border-accent/30"
         >
           <HelpCircle className="w-5 h-5 text-accent" />
