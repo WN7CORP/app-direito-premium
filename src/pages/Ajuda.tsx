@@ -185,8 +185,8 @@ export default function Ajuda() {
                       Entre em contato por e-mail para questões mais detalhadas
                     </p>
                     <div className="space-y-3">
-                      <div className="flex flex-col items-center gap-2">
-                        <code className="w-full px-3 py-2 bg-muted rounded text-sm text-center">
+                      <div className="flex flex-col items-start gap-2">
+                        <code className="w-full px-3 py-2 bg-muted rounded text-sm">
                           wn7corporation@gmail.com
                         </code>
                         <Button size="icon" variant="outline" onClick={copyEmail}>
