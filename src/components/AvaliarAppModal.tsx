@@ -55,7 +55,7 @@ export const AvaliarAppModal = ({
           <div className="w-full flex justify-center py-4">
             <div className="w-56 h-56 flex items-center justify-center">
               <DotLottiePlayer
-                src="/Cat playing animation.lottie"
+                src="/animations/star-rating.lottie"
                 loop
                 autoplay
                 className="w-full h-full"
