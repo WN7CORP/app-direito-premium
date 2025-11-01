@@ -56,7 +56,7 @@ export default function IniciandoDireitoAula() {
   const [mostrarTransicao, setMostrarTransicao] = useState(false);
   const [proximaAulaInfo, setProximaAulaInfo] = useState<{ numero: number; tema: string } | null>(null);
   const conteudoRef = useRef<HTMLDivElement>(null);
-  const { cursos, loading: cursosLoading } = useCursosCache();
+  const { cursos, loading: cursosLoading, invalidateCache } = useCursosCache();
   const { isDesktop } = useDeviceType();
   
   const areaDecoded = area ? decodeURIComponent(area) : '';
@@ -104,7 +104,7 @@ export default function IniciandoDireitoAula() {
       });
       if (error) throw error;
       
-      // Atualizar estado local
+      // Atualiza o estado local imediatamente com o resultado
       setAula({
         ...aula,
         'conteudo-final': data.conteudo_enriquecido,
@@ -113,10 +113,8 @@ export default function IniciandoDireitoAula() {
         conteudo_gerado_em: new Date().toISOString()
       });
       
-      // Invalidar cache para recarregar dados atualizados do banco
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Invalida o cache e recarrega cursos em background
+      invalidateCache();
       
       toast.success('Conteúdo completo gerado com sucesso!');
     } catch (error) {
