@@ -173,7 +173,7 @@ export default function Ajuda() {
               </Button>
             </Card>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="p-3 rounded-full bg-primary/10">
