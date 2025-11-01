@@ -576,30 +576,48 @@ const Pesquisar = () => {
           )}
         
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="w-full grid grid-cols-3 md:grid-cols-6 mb-6 h-auto gap-1 bg-secondary/50 p-1.5">
-            <TabsTrigger value="todos" className="text-xs flex items-center gap-1">
-              Todos 
-              <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{totalResults}</Badge>
+          <TabsList className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-6 h-auto gap-1.5 bg-secondary/50 p-2">
+            <TabsTrigger value="todos" className="text-xs flex flex-col items-center gap-1 py-2 px-2">
+              <div className="flex items-center gap-1">
+                <span>📊</span>
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{totalResults}</Badge>
+              </div>
+              <span className="text-[10px] font-medium">Todos</span>
             </TabsTrigger>
-            <TabsTrigger value="artigos" disabled={!(results.artigos?.length || 0)} className="text-xs flex items-center gap-1">
-              ⚖️ 
-              <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.artigos?.length || 0}</Badge>
+            <TabsTrigger value="artigos" disabled={!(results.artigos?.length || 0)} className="text-xs flex flex-col items-center gap-1 py-2 px-2">
+              <div className="flex items-center gap-1">
+                <span>⚖️</span>
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.artigos?.length || 0}</Badge>
+              </div>
+              <span className="text-[10px] font-medium">Leis</span>
             </TabsTrigger>
-            <TabsTrigger value="videoaulas" disabled={!(results.videoaulas?.length || 0)} className="text-xs flex items-center gap-1">
-              🎥 
-              <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.videoaulas?.length || 0}</Badge>
+            <TabsTrigger value="videoaulas" disabled={!(results.videoaulas?.length || 0)} className="text-xs flex flex-col items-center gap-1 py-2 px-2">
+              <div className="flex items-center gap-1">
+                <span>🎥</span>
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.videoaulas?.length || 0}</Badge>
+              </div>
+              <span className="text-[10px] font-medium">Videoaulas</span>
             </TabsTrigger>
-            <TabsTrigger value="bibliotecas" disabled={!(results.bibliotecas?.length || 0)} className="text-xs flex items-center gap-1">
-              📚 
-              <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.bibliotecas?.length || 0}</Badge>
+            <TabsTrigger value="bibliotecas" disabled={!(results.bibliotecas?.length || 0)} className="text-xs flex flex-col items-center gap-1 py-2 px-2">
+              <div className="flex items-center gap-1">
+                <span>📚</span>
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.bibliotecas?.length || 0}</Badge>
+              </div>
+              <span className="text-[10px] font-medium">Bibliotecas</span>
             </TabsTrigger>
-            <TabsTrigger value="cursos" disabled={!(results.cursos?.length || 0)} className="text-xs flex items-center gap-1">
-              📖 
-              <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.cursos?.length || 0}</Badge>
+            <TabsTrigger value="cursos" disabled={!(results.cursos?.length || 0)} className="text-xs flex flex-col items-center gap-1 py-2 px-2">
+              <div className="flex items-center gap-1">
+                <span>📖</span>
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.cursos?.length || 0}</Badge>
+              </div>
+              <span className="text-[10px] font-medium">Cursos</span>
             </TabsTrigger>
-            <TabsTrigger value="flashcards" disabled={!(results.flashcards?.length || 0)} className="text-xs flex items-center gap-1">
-              ⚡ 
-              <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.flashcards?.length || 0}</Badge>
+            <TabsTrigger value="flashcards" disabled={!(results.flashcards?.length || 0)} className="text-xs flex flex-col items-center gap-1 py-2 px-2">
+              <div className="flex items-center gap-1">
+                <span>⚡</span>
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{results.flashcards?.length || 0}</Badge>
+              </div>
+              <span className="text-[10px] font-medium">Flashcards</span>
             </TabsTrigger>
           </TabsList>
 
