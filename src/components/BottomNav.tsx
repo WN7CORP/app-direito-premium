@@ -77,7 +77,7 @@ export const BottomNav = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-80 p-0">
-              <AppSidebar />
+              <AppSidebar onClose={() => setIsMenuOpen(false)} />
             </SheetContent>
           </Sheet>
         </div>

@@ -38,7 +38,11 @@ import {
 import { cn } from "@/lib/utils";
 import { ProfessoraChatDesktop } from "./ProfessoraChatDesktop";
 
-export const AppSidebar = () => {
+interface AppSidebarProps {
+  onClose?: () => void;
+}
+
+export const AppSidebar = ({ onClose }: AppSidebarProps = {}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [professoraModalOpen, setProfessoraModalOpen] = useState(false);
@@ -250,7 +254,10 @@ export const AppSidebar = () => {
       {/* Ajuda - Fixo no rodapé */}
       <div className="p-4 border-t border-border bg-card">
         <button
-          onClick={() => navigate('/ajuda')}
+          onClick={() => {
+            navigate('/ajuda');
+            onClose?.();
+          }}
           className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-accent/10 hover:bg-accent/20 transition-all text-left border border-accent/30"
         >
           <HelpCircle className="w-5 h-5 text-accent" />
