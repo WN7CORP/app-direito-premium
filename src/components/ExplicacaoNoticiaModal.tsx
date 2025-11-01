@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { formatForWhatsApp } from "@/lib/formatWhatsApp";
 
 interface ExplicacaoNoticiaModalProps {
   isOpen: boolean;
@@ -60,8 +61,9 @@ const ExplicacaoNoticiaModal = ({
   const compartilharWhatsApp = () => {
     if (!explicacao) return;
 
-    const mensagem = `${explicacao}\n\n📎 Link da notícia completa:\n${url}`;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+    const conteudoMarkdown = `# ${titulo}\n\n${explicacao}\n\n---\n\n**Fonte:** ${url}`;
+    const textoFormatado = formatForWhatsApp(conteudoMarkdown);
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(textoFormatado)}`;
     window.open(whatsappUrl, "_blank");
     toast.success("Abrindo WhatsApp...");
   };

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ExplicacaoDetalhadaModal from "./ExplicacaoDetalhadaModal";
+import { formatForWhatsApp } from "@/lib/formatWhatsApp";
 
 interface MessageActionsChatProps {
   content: string;
@@ -25,13 +26,8 @@ export const MessageActionsChat = ({
   const [showExplicacaoDetalhada, setShowExplicacaoDetalhada] = useState(false);
 
   const shareViaWhatsApp = () => {
-    // Remove markdown formatting for plain text WhatsApp sharing
-    const plainText = content
-      .replace(/[#*_`~]/g, '') // Remove markdown symbols
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to plain text
-      .trim();
-    
-    const whatsappText = encodeURIComponent(plainText);
+    const textoFormatado = formatForWhatsApp(content);
+    const whatsappText = encodeURIComponent(textoFormatado);
     const whatsappUrl = `https://wa.me/?text=${whatsappText}`;
     window.open(whatsappUrl, '_blank');
   };

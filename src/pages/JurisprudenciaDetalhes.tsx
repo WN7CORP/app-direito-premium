@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { DotLottiePlayer } from "@dotlottie/react-player";
+import { formatForWhatsApp } from "@/lib/formatWhatsApp";
 
 const JurisprudenciaDetalhes = () => {
   const navigate = useNavigate();
@@ -113,8 +114,25 @@ const JurisprudenciaDetalhes = () => {
   };
 
   const compartilharWhatsApp = () => {
-    const mensagem = `*Jurisprudência: ${jurisprudencia.numeroProcesso}*\n\n*Tribunal:* ${jurisprudencia.tribunal}\n\n*Ementa:*\n${jurisprudencia.ementa}\n\nConsulte: ${jurisprudencia.link}`;
-    const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+    const conteudoMarkdown = `
+# ${jurisprudencia.numeroProcesso}
+
+**Tribunal:** ${jurisprudencia.tribunal}
+${jurisprudencia.orgaoJulgador ? `**Órgão Julgador:** ${jurisprudencia.orgaoJulgador}` : ''}
+${jurisprudencia.dataJulgamento ? `**Data:** ${new Date(jurisprudencia.dataJulgamento).toLocaleDateString('pt-BR')}` : ''}
+${jurisprudencia.temaJuridico ? `**Tema:** ${jurisprudencia.temaJuridico}` : ''}
+
+## Ementa
+
+${jurisprudencia.ementa}
+
+---
+
+**Consulte:** ${jurisprudencia.link}
+`;
+    
+    const textoFormatado = formatForWhatsApp(conteudoMarkdown);
+    const url = `https://wa.me/?text=${encodeURIComponent(textoFormatado)}`;
     window.open(url, '_blank');
   };
 

@@ -108,8 +108,26 @@ export const ShareResultModal = ({ open, onClose, partida, caso }: ShareResultMo
           
           toast.success("Imagem gerada com sucesso!");
           
-          // Criar link do WhatsApp
-          const textoWhatsApp = `Acabei de ${resultado === 'GANHOU' ? 'vencer' : 'participar de'} uma simulação jurídica no App Direito Premium! 📚⚖️`;
+          // Criar mensagem formatada para WhatsApp
+          const textoWhatsApp = `⚖️ *SIMULAÇÃO JURÍDICA CONCLUÍDA* ⚖️
+
+━━━━━━━━━━━━━━
+
+🎓 *Dr(a). ${nome}*
+
+${resultado === 'GANHOU' ? '🏆 *VENCI A CAUSA!*' : deferimentoParcial ? '⚖️ *OBTIVE DEFERIMENTO PARCIAL*' : '📚 *EXPERIÊNCIA CONCLUÍDA*'}
+
+*Caso:* ${caso.titulo_caso}
+
+📊 *Estatísticas:*
+• Pontuação: *${partida.pontuacao_final}* pontos
+• Combo Máximo: *${partida.combo_maximo || 0}*x
+${partida.argumentos_apresentados ? `• Argumentos: *${partida.argumentos_apresentados}*` : ''}
+
+━━━━━━━━━━━━━━
+
+_Compartilhado do App Direito Premium_
+🎯 Simulador Jurídico Interativo`;
           const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoWhatsApp)}`;
           
           setTimeout(() => {

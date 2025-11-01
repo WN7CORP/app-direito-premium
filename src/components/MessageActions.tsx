@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ExplicacaoDetalhadaModal from "./ExplicacaoDetalhadaModal";
+import { formatForWhatsApp } from "@/lib/formatWhatsApp";
 
 interface MessageActionsProps {
   message?: string;
@@ -76,7 +77,8 @@ export const MessageActions = ({
   };
 
   const shareViaWhatsApp = () => {
-    const whatsappText = encodeURIComponent(text);
+    const textoFormatado = formatForWhatsApp(text);
+    const whatsappText = encodeURIComponent(textoFormatado);
     const whatsappUrl = `https://wa.me/?text=${whatsappText}`;
     window.open(whatsappUrl, '_blank');
   };
