@@ -29,6 +29,7 @@ import Pesquisar from "./pages/Pesquisar";
 import ChatProfessora from "./pages/ChatProfessora";
 import AulaInterativa from "./pages/AulaInterativa";
 import Dicionario from "./pages/Dicionario";
+import DicionarioLetra from "./pages/DicionarioLetra";
 import Ferramentas from "./pages/Ferramentas";
 import Advogado from "./pages/Advogado";
 import AdvogadoModelos from "./pages/AdvogadoModelos";
@@ -209,6 +210,7 @@ const App = () => {
               <Route path="/aula-interativa" element={<AulaInterativa />} />
               <Route path="/ferramentas" element={<Ferramentas />} />
               <Route path="/dicionario" element={<Dicionario />} />
+              <Route path="/dicionario/:letra" element={<DicionarioLetra />} />
               <Route path="/bibliotecas" element={<Bibliotecas />} />
             <Route path="/biblioteca-oab" element={<BibliotecaOAB />} />
             <Route path="/biblioteca-oab/:livroId" element={<BibliotecaOABLivro />} />

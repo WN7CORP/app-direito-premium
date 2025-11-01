@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Book, Search, Lightbulb, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useNavigate } from "react-router-dom";
 
 interface DicionarioTermo {
   Letra: string | null;
@@ -24,19 +25,15 @@ interface DicionarioTermo {
 }
 
 const Dicionario = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
   const [exemploPratico, setExemploPratico] = useState<{ [palavra: string]: string }>({});
   const [loadingExemplo, setLoadingExemplo] = useState<{ [palavra: string]: boolean }>({});
-  const [resultados, setResultados] = useState<DicionarioTermo[]>([]);
-  const [sugestoes, setSugestoes] = useState<string[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
 
-  // Debounce para busca em tempo real
-  const debouncedSearch = useDebounce(searchQuery, 500);
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
-  // Buscar letras disponíveis apenas
+  // Buscar letras disponíveis
   const { data: letrasDisponiveis = [] } = useQuery({
     queryKey: ["dicionario-letras"],
     queryFn: async () => {
@@ -52,79 +49,70 @@ const Dicionario = () => {
     staleTime: 1000 * 60 * 60,
   });
 
-  // Todas as letras do alfabeto
   const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-  // Função de busca otimizada
-  const realizarBusca = useCallback(async () => {
-    const termoBusca = debouncedSearch.trim();
-    
-    if (!termoBusca && !selectedLetter) {
-      setResultados([]);
-      setSugestoes([]);
-      return;
-    }
+  // Buscar termos pela pesquisa global
+  const { data: resultados = [], isLoading: isSearching } = useQuery({
+    queryKey: ["dicionario-busca", debouncedSearch],
+    queryFn: async () => {
+      const termoBusca = debouncedSearch.trim();
+      if (!termoBusca) return [];
 
-    setIsSearching(true);
-    setSugestoes([]);
-
-    try {
-      let query = supabase.from("DICIONARIO" as any).select("*");
-
-      // Se tem letra selecionada, filtra por ela
-      if (selectedLetter) {
-        query = query.eq("Letra", selectedLetter);
-      }
-
-      // Se tem termo de busca, filtra por palavra
-      if (termoBusca) {
-        query = query.ilike("Palavra", `%${termoBusca}%`);
-      }
-
-      const { data, error } = await query
+      const { data, error } = await supabase
+        .from("DICIONARIO" as any)
+        .select("*")
+        .or(`Palavra.ilike.%${termoBusca}%,Significado.ilike.%${termoBusca}%`)
         .order("Palavra", { ascending: true })
-        .limit(100);
+        .limit(50);
 
       if (error) throw error;
 
-      const resultadosEncontrados = (data || []) as unknown as DicionarioTermo[];
-      setResultados(resultadosEncontrados);
-
-      // Se não encontrou nada e tem termo de busca, buscar sugestões
-      if (resultadosEncontrados.length === 0 && termoBusca) {
-        // Buscar sugestões inline
-        const primeiraLetra = termoBusca.charAt(0).toUpperCase();
-        const { data: sugestoesData } = await supabase
-          .from("DICIONARIO" as any)
-          .select("Palavra")
-          .eq("Letra", primeiraLetra)
-          .limit(5);
-
-        const palavrasSimilares = (sugestoesData || [])
-          .map((d: any) => d.Palavra)
-          .filter((p: string) => p && p.toLowerCase().includes(termoBusca.slice(0, 3).toLowerCase()))
-          .slice(0, 3);
-
-        setSugestoes(palavrasSimilares);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar:", error);
-      toast({
-        title: "Erro ao buscar termos",
-        description: "Tente novamente mais tarde.",
-        variant: "destructive",
+      const termos = (data || []) as unknown as DicionarioTermo[];
+      
+      // Ordenar por relevância: exato > começa com > contém
+      return termos.sort((a, b) => {
+        const palavraA = (a.Palavra || "").toLowerCase();
+        const palavraB = (b.Palavra || "").toLowerCase();
+        const termo = termoBusca.toLowerCase();
+        
+        const exatoA = palavraA === termo;
+        const exatoB = palavraB === termo;
+        if (exatoA && !exatoB) return -1;
+        if (!exatoA && exatoB) return 1;
+        
+        const começaA = palavraA.startsWith(termo);
+        const começaB = palavraB.startsWith(termo);
+        if (começaA && !começaB) return -1;
+        if (!começaA && começaB) return 1;
+        
+        return 0;
       });
-    } finally {
-      setIsSearching(false);
-    }
-  }, [debouncedSearch, selectedLetter, toast]);
+    },
+    enabled: debouncedSearch.trim().length > 0,
+  });
 
-  // Efeito para busca em tempo real com debounce
-  useEffect(() => {
-    realizarBusca();
-  }, [debouncedSearch, selectedLetter]);
+  // Buscar sugestões se não encontrar resultados
+  const { data: sugestoes = [] } = useQuery({
+    queryKey: ["dicionario-sugestoes", debouncedSearch],
+    queryFn: async () => {
+      const termoBusca = debouncedSearch.trim();
+      if (!termoBusca || resultados.length > 0) return [];
 
-  // Agrupar por letra
+      const primeiraLetra = termoBusca.charAt(0).toUpperCase();
+      const { data } = await supabase
+        .from("DICIONARIO" as any)
+        .select("Palavra")
+        .eq("Letra", primeiraLetra)
+        .limit(10);
+
+      return (data || [])
+        .map((d: any) => d.Palavra)
+        .filter((p: string) => p && p.toLowerCase().includes(termoBusca.slice(0, 3).toLowerCase()))
+        .slice(0, 3);
+    },
+    enabled: debouncedSearch.trim().length > 0,
+  });
+
   const termosPorLetra = useMemo(() => {
     const grouped: { [key: string]: DicionarioTermo[] } = {};
     resultados.forEach((termo) => {
@@ -205,38 +193,26 @@ const Dicionario = () => {
         />
       </div>
 
-      {/* Seletor de Letras - 4 por linha */}
+      {/* Seletor de Letras - Maiores e clicáveis */}
       <div className="mb-6">
         <p className="text-xs font-semibold text-muted-foreground mb-3">Buscar por letra:</p>
-        <div className="grid grid-cols-4 gap-2">
-          <Badge
-            variant={selectedLetter === null ? "default" : "outline"}
-            className={cn(
-              "cursor-pointer transition-all h-10 flex items-center justify-center text-base",
-              selectedLetter === null && "bg-accent text-accent-foreground"
-            )}
-            onClick={() => {
-              setSelectedLetter(null);
-              setSearchQuery("");
-            }}
-          >
-            Todas
-          </Badge>
+        <div className="grid grid-cols-4 gap-3">
           {alfabeto.map((letra) => {
             const disponivel = letrasDisponiveis.includes(letra);
             return (
-              <Badge
+              <Button
                 key={letra}
-                variant={selectedLetter === letra ? "default" : "outline"}
+                variant="outline"
+                size="lg"
                 className={cn(
-                  "cursor-pointer transition-all h-10 flex items-center justify-center text-base font-semibold",
-                  selectedLetter === letra && "bg-accent text-accent-foreground",
+                  "h-14 text-xl font-bold transition-all",
                   !disponivel && "opacity-30 cursor-not-allowed"
                 )}
-                onClick={() => disponivel && setSelectedLetter(letra)}
+                onClick={() => disponivel && navigate(`/dicionario/${letra}`)}
+                disabled={!disponivel}
               >
                 {letra}
-              </Badge>
+              </Button>
             );
           })}
         </div>
@@ -270,8 +246,7 @@ const Dicionario = () => {
             <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
-      ) : resultados.length === 0 && (searchQuery || selectedLetter) ? (
-        /* Nenhum Resultado */
+      ) : resultados.length === 0 && searchQuery ? (
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-3">
             <Book className="w-7 h-7 text-muted-foreground" />
@@ -280,7 +255,7 @@ const Dicionario = () => {
             Nenhum termo encontrado
           </p>
         </div>
-      ) : resultados.length === 0 ? (
+      ) : !searchQuery ? (
         /* Estado Inicial */
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary mb-3">
