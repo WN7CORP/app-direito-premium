@@ -22,6 +22,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import { SuporteChatModal } from "@/components/SuporteChatModal";
+import { EmailSupportModal } from "@/components/EmailSupportModal";
 import { FAQSearch } from "@/components/FAQSearch";
 import { AppStatisticsCard } from "@/components/AppStatisticsCard";
 import { useAppStatistics } from "@/hooks/useAppStatistics";
@@ -29,6 +30,7 @@ import { toast } from "sonner";
 
 export default function Ajuda() {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { statistics, isLoading } = useAppStatistics();
 
@@ -182,12 +184,22 @@ export default function Ajuda() {
                     <p className="text-muted-foreground mb-3">
                       Entre em contato por e-mail para questões mais detalhadas
                     </p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 px-3 py-2 bg-muted rounded text-sm">
-                        wn7corporation@gmail.com
-                      </code>
-                      <Button size="icon" variant="outline" onClick={copyEmail}>
-                        <Copy className="w-4 h-4" />
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 px-3 py-2 bg-muted rounded text-sm">
+                          wn7corporation@gmail.com
+                        </code>
+                        <Button size="icon" variant="outline" onClick={copyEmail}>
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <Button 
+                        className="w-full gap-2" 
+                        variant="default"
+                        onClick={() => setIsEmailModalOpen(true)}
+                      >
+                        <Mail className="w-4 h-4" />
+                        Reportar Bug ou Enviar Feedback
                       </Button>
                     </div>
                   </div>
@@ -330,6 +342,7 @@ export default function Ajuda() {
       </div>
 
       <SuporteChatModal open={isChatOpen} onOpenChange={setIsChatOpen} />
+      <EmailSupportModal open={isEmailModalOpen} onOpenChange={setIsEmailModalOpen} />
     </div>
   );
 }
