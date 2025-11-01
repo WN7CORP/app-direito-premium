@@ -75,45 +75,24 @@ const ExplicacaoNoticiaModal = ({
       setExportingPDF(true);
       toast.info("Gerando PDF...");
 
+      const conteudoCompleto = `${explicacao}\n\n---\n\n**Fonte:** ${url}`;
+
       const { data, error } = await supabase.functions.invoke("exportar-pdf-educacional", {
         body: {
-          titulo: `Explicação: ${titulo}`,
-          conteudo: explicacao,
-          rodape: `Link da notícia: ${url}`,
+          content: conteudoCompleto,
+          filename: `explicacao-noticia-${Date.now()}`,
+          title: `Explicação: ${titulo}`,
         },
       });
 
       if (error) throw error;
 
-      if (data?.pdfBase64) {
-        const byteCharacters = atob(data.pdfBase64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: "application/pdf" });
-
-        const nomeArquivo = `explicacao-noticia-${Date.now()}.pdf`;
-        
-        // Mobile: compartilhar via Web Share API
-        if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          const file = new File([blob], nomeArquivo, { type: "application/pdf" });
-          await navigator.share({
-            title: "Explicação da Notícia",
-            files: [file],
-          });
-        } else {
-          // Desktop: download direto
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = nomeArquivo;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-
+      if (data?.pdfUrl) {
+        // Abrir o PDF em nova aba
+        window.open(data.pdfUrl, '_blank');
         toast.success("PDF gerado com sucesso!");
+      } else {
+        throw new Error("URL do PDF não foi retornada");
       }
     } catch (error) {
       console.error("Erro ao exportar PDF:", error);
