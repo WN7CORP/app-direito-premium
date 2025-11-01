@@ -36,6 +36,7 @@ import {
   HelpCircle,
   Star
 } from "lucide-react";
+import { DotLottiePlayer } from '@dotlottie/react-player';
 import { cn } from "@/lib/utils";
 import { ProfessoraChatDesktop } from "./ProfessoraChatDesktop";
 import { AvaliarAppModal } from "./AvaliarAppModal";
@@ -121,7 +122,14 @@ export const AppSidebar = ({ onClose }: AppSidebarProps = {}) => {
           onClick={() => setAvaliarModalOpen(true)}
           className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 transition-all text-left border border-yellow-500/30"
         >
-          <Star className="w-5 h-5 text-yellow-500 animate-pulse" />
+          <div className="w-5 h-5 flex items-center justify-center">
+            <DotLottiePlayer
+              src="/animations/star-rating.lottie"
+              loop
+              autoplay
+              style={{ width: '24px', height: '24px' }}
+            />
+          </div>
           <span className="text-sm font-medium text-foreground">Avaliar App</span>
         </button>
       </div>
