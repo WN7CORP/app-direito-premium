@@ -45,7 +45,7 @@ export const FlashcardViewer = ({
           <p className="text-xs text-muted-foreground mt-4 text-center">Clique para ver a resposta</p>
         </div>
 
-        <div onClick={() => setIsFlipped(false)} className="h-[300px] bg-card border-2 border-[hsl(270,60%,55%)] rounded-xl p-4 sm:p-8 cursor-pointer hover:shadow-lg transition-shadow relative break-words overflow-y-auto">
+        <div onClick={() => setIsFlipped(false)} className="min-h-[300px] bg-card border-2 border-[hsl(270,60%,55%)] rounded-xl p-4 sm:p-8 cursor-pointer hover:shadow-lg transition-shadow relative break-words">
           {tema && (
             <p className="text-xs text-[hsl(270,70%,75%)] mb-3 absolute top-4 left-4">
               {tema}
