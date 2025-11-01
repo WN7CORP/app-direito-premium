@@ -99,24 +99,15 @@ export const ResumoVideoModal = ({ open, onOpenChange, videoId, titulo }: Resumo
         throw new Error(data.error);
       }
 
-      // Criar blob e fazer download
-      const pdfBlob = new Blob(
-        [Uint8Array.from(atob(data.pdf), c => c.charCodeAt(0))], 
-        { type: 'application/pdf' }
-      );
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `resumo-${titulo.substring(0, 30)}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: "PDF exportado!",
-        description: "O resumo foi exportado em formato ABNT com sucesso.",
-      });
+      // Abrir PDF em nova aba
+      if (data?.pdfUrl) {
+        window.open(data.pdfUrl, '_blank');
+        
+        toast({
+          title: "PDF exportado!",
+          description: "Link válido por 24 horas. Abrindo em nova aba...",
+        });
+      }
     } catch (error) {
       console.error("Erro ao exportar PDF:", error);
       toast({

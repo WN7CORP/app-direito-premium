@@ -7,7 +7,7 @@ import { Loader2, FileUp, ChevronRight, ChevronLeft, CheckCircle2, FileText, Upl
 import { useDropzone } from "react-dropzone";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { exportPeticaoPDF } from "@/components/PeticaoPDFExporter";
+
 import ReactMarkdown from "react-markdown";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -202,18 +202,46 @@ const AdvogadoCriar = () => {
     setCurrentStep(currentStep + 1);
   };
 
-  const handleExportarPDF = () => {
+  const handleExportarPDF = async () => {
     const jurisprudenciasPDF = jurisprudenciasSelecionadas.map(i => jurisprudenciasSugeridas[i]);
     
-    exportPeticaoPDF({
-      titulo: `${tipoPeticao} - ${areaDireito}`,
-      conteudo: {
-        etapa1: peticaoGerada.split('\n\n')[0] || "",
-        etapa2: peticaoGerada.split('\n\n')[1] || "",
-        etapa3: peticaoGerada.split('\n\n')[2] || "",
-      },
-      jurisprudencias: jurisprudenciasPDF,
-    });
+    try {
+      toast({
+        title: "Gerando PDF...",
+        description: "Isso pode levar alguns segundos",
+      });
+
+      const { data, error } = await supabase.functions.invoke("exportar-peticao-pdf", {
+        body: {
+          titulo: `${tipoPeticao} - ${areaDireito}`,
+          conteudo: {
+            etapa1: peticaoGerada.split('\n\n')[0] || "",
+            etapa2: peticaoGerada.split('\n\n')[1] || "",
+            etapa3: peticaoGerada.split('\n\n')[2] || "",
+          },
+          jurisprudencias: jurisprudenciasPDF,
+        },
+      });
+
+      if (error) throw error;
+
+      // Abrir PDF em nova aba
+      if (data?.pdfUrl) {
+        window.open(data.pdfUrl, '_blank');
+        
+        toast({
+          title: "PDF exportado com sucesso!",
+          description: "Link válido por 24 horas. Abrindo em nova aba...",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao exportar PDF:", error);
+      toast({
+        title: "Erro ao exportar PDF",
+        description: "Tente novamente mais tarde",
+        variant: "destructive",
+      });
+    }
   };
 
   const steps = [

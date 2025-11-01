@@ -27,9 +27,9 @@ serve(async (req) => {
 
     console.log('✅ Validação de dados OK');
 
-    // Importar jsPDF via unpkg
+    // Importar jsPDF dinamicamente (método correto)
     console.log('📦 Importando jsPDF...');
-    const jsPDF = (await import('https://unpkg.com/jspdf@2.5.2/dist/jspdf.es.min.js')).default;
+    const jsPDF = (await import("https://esm.sh/jspdf@2.5.1")).default;
     console.log('✅ jsPDF importado');
     
     const doc = new jsPDF();

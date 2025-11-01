@@ -247,15 +247,63 @@ serve(async (req) => {
       pdf.text(`${i}`, 190, 287, { align: 'right' });
     }
 
-    // Gerar PDF como base64
-    const pdfBase64 = pdf.output('datauristring').split(',')[1];
+    // Gerar PDF como ArrayBuffer
+    const pdfArrayBuffer = pdf.output('arraybuffer');
+    const pdfUint8Array = new Uint8Array(pdfArrayBuffer);
 
     console.log("PDF ABNT formatado com Markdown gerado com sucesso");
 
+    // Upload para Supabase Storage
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const filename = `resumo-${Date.now()}-${titulo.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    const bucketName = "pdfs-educacionais";
+
+    const uploadResponse = await fetch(
+      `${supabaseUrl}/storage/v1/object/${bucketName}/${filename}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${supabaseServiceKey}`,
+          "Content-Type": "application/pdf",
+        },
+        body: pdfUint8Array,
+      }
+    );
+
+    if (!uploadResponse.ok) {
+      const errorText = await uploadResponse.text();
+      console.error("Erro ao fazer upload:", errorText);
+      throw new Error("Erro ao fazer upload do PDF");
+    }
+
+    // Gerar URL assinada (válida por 24 horas)
+    const signedUrlResponse = await fetch(
+      `${supabaseUrl}/storage/v1/object/sign/${bucketName}/${filename}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${supabaseServiceKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ expiresIn: 86400 }), // 24 horas
+      }
+    );
+
+    if (!signedUrlResponse.ok) {
+      throw new Error("Erro ao gerar URL assinada");
+    }
+
+    const { signedURL } = await signedUrlResponse.json();
+    const fullSignedUrl = `${supabaseUrl}/storage/v1${signedURL}`;
+
+    console.log("PDF salvo e URL gerada:", fullSignedUrl);
+
     return new Response(
       JSON.stringify({ 
-        pdf: pdfBase64,
-        filename: `resumo-${titulo.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
+        pdfUrl: fullSignedUrl,
+        message: "PDF gerado com sucesso! Link válido por 24 horas."
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

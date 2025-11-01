@@ -164,23 +164,15 @@ const ResumosProntosView = () => {
       });
       if (error) throw error;
       
-      // Decodificar base64 e criar blob
-      const pdfBlob = await fetch(`data:application/pdf;base64,${data.pdf}`).then(r => r.blob());
-      
-      // Criar URL temporária e forçar download
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = data.filename || `resumo-${resumo.subtema}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: "PDF baixado!",
-        description: "O arquivo foi salvo no seu dispositivo"
-      });
+      // Abrir PDF em nova aba
+      if (data?.pdfUrl) {
+        window.open(data.pdfUrl, '_blank');
+        
+        toast({
+          title: "PDF exportado!",
+          description: "Link válido por 24 horas. Abrindo em nova aba..."
+        });
+      }
     } catch (error: any) {
       console.error("Erro ao gerar PDF:", error);
       toast({
