@@ -462,10 +462,10 @@ const EstatutoView = () => {
               return (
                 <div
                   key={article.id}
-                  className="text-center mb-8 space-y-1 font-serif-content"
+                  className="text-center mb-4 mt-6 font-serif-content"
                 >
                   <div
-                    className="whitespace-pre-line"
+                    className="text-sm leading-tight text-muted-foreground/80 whitespace-pre-line"
                     dangerouslySetInnerHTML={{
                       __html: formatTextWithUppercase(article["Artigo"] || "")
                     }}
