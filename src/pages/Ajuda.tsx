@@ -89,25 +89,6 @@ export default function Ajuda() {
       ]
     },
     {
-      id: "conta",
-      title: "Conta e Acesso",
-      icon: User,
-      questions: [
-        {
-          q: "Como criar uma conta?",
-          a: "Clique em 'Entrar' no menu e siga as instruções para criar sua conta com e-mail ou Google."
-        },
-        {
-          q: "Esqueci minha senha, como recupero?",
-          a: "Na tela de login, clique em 'Esqueci minha senha' e siga as instruções enviadas por e-mail."
-        },
-        {
-          q: "Posso usar em mais de um dispositivo?",
-          a: "Sim! Sua conta sincroniza automaticamente em todos os dispositivos."
-        }
-      ]
-    },
-    {
       id: "outros",
       title: "Outros",
       icon: HelpCircle,
