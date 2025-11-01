@@ -103,6 +103,8 @@ export default function IniciandoDireitoAula() {
         }
       });
       if (error) throw error;
+      
+      // Atualizar estado local
       setAula({
         ...aula,
         'conteudo-final': data.conteudo_enriquecido,
@@ -110,6 +112,12 @@ export default function IniciandoDireitoAula() {
         questoes: data.questoes,
         conteudo_gerado_em: new Date().toISOString()
       });
+      
+      // Invalidar cache para recarregar dados atualizados do banco
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
       toast.success('Conteúdo completo gerado com sucesso!');
     } catch (error) {
       console.error('Erro ao gerar conteúdo:', error);

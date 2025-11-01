@@ -27,11 +27,14 @@ serve(async (req) => {
     console.log('Chave para Gemini configurada:', API_KEY ? 'Sim (oculta)' : 'Não');
 
     // Prompt para melhorar e enriquecer o conteúdo existente
-    const promptConteudo = `Você é um professor de Direito experiente e didático. Recebeu o seguinte conteúdo educacional base:
+    const promptConteudo = `Você é um professor de Direito experiente e didático. 
 
+IMPORTANTE: Você DEVE melhorar e expandir EXATAMENTE o conteúdo fornecido abaixo, mantendo 100% de fidelidade ao tema "${tema}" da área "${area}". NÃO invente outro tema, NÃO mude o assunto.
+
+CONTEÚDO BASE A SER MELHORADO:
 ${conteudo_base}
 
-Sua tarefa é MELHORAR e ENRIQUECER este conteúdo, deixando-o muito mais explicado e detalhado para que os alunos entendam profundamente cada ponto. Siga estas diretrizes:
+Sua tarefa é MELHORAR e ENRIQUECER ESTE CONTEÚDO ESPECÍFICO, deixando-o muito mais explicado e detalhado para que os alunos entendam profundamente cada ponto. Siga estas diretrizes:
 
 **EXPANSÃO DO CONTEÚDO:**
 1. Pegue cada conceito e explique de forma mais aprofundada e didática
