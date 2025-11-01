@@ -35,6 +35,7 @@ import AdvogadoModelos from "./pages/AdvogadoModelos";
 import AdvogadoCriar from "./pages/AdvogadoCriar";
 import Novidades from "./pages/Novidades";
 import Suporte from "./pages/Suporte";
+import Ajuda from "./pages/Ajuda";
 import Estagios from "./pages/Estagios";
 import EstagioDetalhes from "./pages/EstagioDetalhes";
 import EstagiosDicas from "./pages/EstagiosDicas";
@@ -297,6 +298,7 @@ const App = () => {
               <Route path="/buscar-jurisprudencia" element={<BuscarJurisprudencia />} />
               <Route path="/novidades" element={<Novidades />} />
               <Route path="/suporte" element={<Suporte />} />
+              <Route path="/ajuda" element={<Ajuda />} />
               <Route path="/assistente-pessoal" element={<AssistentePessoal />} />
               <Route path="/meu-brasil" element={<MeuBrasil />} />
               <Route path="/meu-brasil/historia" element={<MeuBrasilHistoria />} />

@@ -32,16 +32,15 @@ import {
   FileSearch,
   FileCheck2,
   ClipboardCheck,
-  MessageCircle
+  MessageCircle,
+  HelpCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SuporteChatModal } from "./SuporteChatModal";
 import { ProfessoraChatDesktop } from "./ProfessoraChatDesktop";
 
 export const AppSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [suporteModalOpen, setSuporteModalOpen] = useState(false);
   const [professoraModalOpen, setProfessoraModalOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
@@ -97,11 +96,6 @@ export const AppSidebar = () => {
     { title: "Simulados", icon: ClipboardCheck, path: "/simulados" },
     { title: "Realizar Simulados", icon: FileText, path: "/simulados-exames" },
   ];
-
-
-  const handleSuporteClick = () => {
-    setSuporteModalOpen(true);
-  };
 
   return (
     <div className="flex flex-col h-full bg-card border-r border-border">
@@ -253,18 +247,17 @@ export const AppSidebar = () => {
         </div>
       </div>
 
-      {/* Suporte - Fixo no rodapé */}
+      {/* Ajuda - Fixo no rodapé */}
       <div className="p-4 border-t border-border bg-card">
         <button
-          onClick={handleSuporteClick}
+          onClick={() => navigate('/ajuda')}
           className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-accent/10 hover:bg-accent/20 transition-all text-left border border-accent/30"
         >
-          <MessageCircle className="w-5 h-5 text-accent" />
-          <span className="text-sm font-medium text-foreground">Suporte</span>
+          <HelpCircle className="w-5 h-5 text-accent" />
+          <span className="text-sm font-medium text-foreground">Ajuda</span>
         </button>
       </div>
 
-      <SuporteChatModal open={suporteModalOpen} onOpenChange={setSuporteModalOpen} />
       <ProfessoraChatDesktop 
         isOpen={professoraModalOpen} 
         onClose={() => setProfessoraModalOpen(false)} 
