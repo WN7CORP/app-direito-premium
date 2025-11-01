@@ -78,7 +78,7 @@ export const ArtigoActionsMenu = ({
           {onOpenExplicacao && (
             <button
               onClick={() => onOpenExplicacao("explicacao")}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30"
               style={{ animationDelay: '0ms' }}
             >
               <Lightbulb className="w-4 h-4" />
@@ -90,7 +90,7 @@ export const ArtigoActionsMenu = ({
           {onOpenExplicacao && (
             <button
               onClick={() => onOpenExplicacao("exemplo")}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30"
               style={{ animationDelay: '30ms' }}
             >
               <BookOpen className="w-4 h-4" />
@@ -102,7 +102,7 @@ export const ArtigoActionsMenu = ({
           {onOpenTermos && (
             <button
               onClick={onOpenTermos}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30"
               style={{ animationDelay: '60ms' }}
             >
               <BookMarked className="w-4 h-4" />
@@ -114,7 +114,7 @@ export const ArtigoActionsMenu = ({
           {onOpenQuestoes && (
             <button
               onClick={onOpenQuestoes}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30"
               style={{ animationDelay: '90ms' }}
             >
               <FileQuestion className="w-4 h-4" />
@@ -127,7 +127,7 @@ export const ArtigoActionsMenu = ({
             <button
               onClick={onGenerateFlashcards}
               disabled={loadingFlashcards}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30 disabled:opacity-50"
               style={{ animationDelay: '120ms' }}
             >
               <Bookmark className="w-4 h-4" />
@@ -142,7 +142,7 @@ export const ArtigoActionsMenu = ({
                 article["Comentario"]!,
                 `Comentário - Art. ${article["Número do Artigo"]}`
               )}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30"
               style={{ animationDelay: '150ms' }}
             >
               <MessageSquare className="w-4 h-4" />
@@ -154,7 +154,7 @@ export const ArtigoActionsMenu = ({
           {hasAula && onOpenAula && (
             <button
               onClick={onOpenAula}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30"
               style={{ animationDelay: '180ms' }}
             >
               <GraduationCap className="w-4 h-4" />
@@ -166,7 +166,7 @@ export const ArtigoActionsMenu = ({
           {onPerguntar && (
             <button
               onClick={onPerguntar}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30"
               style={{ animationDelay: '210ms' }}
             >
               <MessageSquare className="w-4 h-4" />
@@ -178,7 +178,7 @@ export const ArtigoActionsMenu = ({
           {onShareWhatsApp && (
             <button
               onClick={onShareWhatsApp}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/70 hover:bg-accent/90 text-white rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in shadow-lg"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-accent/20 hover:bg-accent/30 text-foreground rounded-lg transition-all duration-150 text-sm font-medium hover:scale-[1.02] animate-fade-in border border-accent/30"
               style={{ animationDelay: '240ms' }}
             >
               <Share2 className="w-4 h-4" />

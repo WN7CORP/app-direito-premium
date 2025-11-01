@@ -81,27 +81,29 @@ export const CopyButton = ({ text, articleNumber, narrationUrl }: CopyButtonProp
           <button
             onClick={handlePlayNarration}
             disabled={loading}
-            className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-xs font-medium hover:scale-105 bg-accent/15 hover:bg-accent/25 border-accent/30 text-accent overflow-hidden group"
+            className="relative flex items-center gap-2 px-3.5 py-2.5 rounded-lg transition-all border text-sm font-medium hover:scale-105 bg-accent/90 hover:bg-accent border-accent text-white overflow-hidden group shadow-lg"
             title={isPlaying ? "Pausar Narração" : "Ouvir Narração"}
           >
             {/* Barra de progresso por dentro */}
             {isPlaying && (
               <div 
-                className="absolute inset-0 bg-accent/20 transition-all duration-200 ease-linear"
+                className="absolute inset-0 bg-white/10 transition-all duration-200 ease-linear"
                 style={{ width: `${progress}%` }}
               />
             )}
             
             {/* Conteúdo */}
-            <div className="relative z-10 flex items-center gap-1.5">
+            <div className="relative z-10 flex items-center gap-2">
               {loading ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
               ) : isPlaying ? (
-                <AudioWaveAnimation />
+                <div className="text-white">
+                  <AudioWaveAnimation />
+                </div>
               ) : (
-                <Volume2 className="w-3.5 h-3.5" />
+                <Volume2 className="w-4 h-4 text-white" />
               )}
-              <span>{isPlaying ? "Pausar" : "Narração"}</span>
+              <span className="text-white">{isPlaying ? "Pausar" : "Narração"}</span>
             </div>
           </button>
         </>
